@@ -20,20 +20,16 @@ namespace DistSysACW.Controllers
 
 
         [ActionName("Hello")]
-        public string Get()
-        {
-            #region TASK1
-            // TODO: add api/talkback/hello response
-            #endregion
-        }
+        public String Get() => "Hello World";
 
         [ActionName("Sort")]
-        public IActionResult Get([FromQuery]int[] integers)
+        public IActionResult Get([FromQuery] int[] integers)
         {
             #region TASK1
             // TODO: 
             // sort the integers into ascending order
             // send the integers back as the api/talkback/sort response
+            throw new NotImplementedException();
             #endregion
         }
     }
