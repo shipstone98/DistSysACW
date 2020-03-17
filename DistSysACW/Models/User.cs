@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DistSysACW.Models
@@ -20,7 +21,23 @@ namespace DistSysACW.Models
     {
         public static async Task<User> CreateAsync(UserContext context, String userName)
         {
-            throw new NotImplementedException();
+            String id;
+
+            do
+            {
+                id = Guid.NewGuid().ToString();
+            } while (UserDatabaseAccess.Exists(context, id));
+
+            User user = new User
+            {
+                ApiKey = id,
+                Role = context.Users.Count() == 0 ? UserRole.Admin : UserRole.User,
+                UserName = userName
+            };
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+            return user;
         }
 
         public static async Task DeleteAsync(UserContext context, String apiKey)
