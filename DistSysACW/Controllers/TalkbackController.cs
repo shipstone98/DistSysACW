@@ -1,12 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace DistSysACW.Controllers
 {
@@ -20,21 +15,29 @@ namespace DistSysACW.Controllers
 
 
         [ActionName("Hello")]
-        public string Get()
-        {
-            #region TASK1
-            // TODO: add api/talkback/hello response
-            #endregion
-        }
+        public String Get() => "Hello World";
 
         [ActionName("Sort")]
-        public IActionResult Get([FromQuery]int[] integers)
+        public IActionResult Get([FromQuery] int[] integers)
         {
-            #region TASK1
-            // TODO: 
-            // sort the integers into ascending order
-            // send the integers back as the api/talkback/sort response
-            #endregion
+            if (integers.Length == 0)
+            {
+                return this.Ok("[]");
+            }
+
+            List<int> sortedIntegers = new List<int>(integers);
+            sortedIntegers.Sort();
+            integers = sortedIntegers.ToArray();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[" + integers[0]);
+
+            for (int i = 1; i < sortedIntegers.Count; i ++)
+            {
+                sb.Append("," + integers[i]);
+            }
+
+            sb.Append("]");
+            return this.Ok(sb.ToString());
         }
     }
 }
