@@ -62,7 +62,15 @@ namespace DistSysACW.Models
 
         public static User Get(UserContext context, String apiKey)
         {
-            throw new NotImplementedException();
+            foreach (User user in context.Users)
+            {
+                if (user.ApiKey.Equals(apiKey))
+                {
+                    return user;
+                }
+            }
+
+            return null;
         }
     }
 }
