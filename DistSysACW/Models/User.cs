@@ -45,14 +45,19 @@ namespace DistSysACW.Models
             throw new NotImplementedException();
         }
 
-        public static bool Exists(UserContext context, String apiKey)
-        {
-            throw new NotImplementedException();
-        }
+        public static bool Exists(UserContext context, String apiKey) => !(UserDatabaseAccess.Get(context, apiKey) is null);
 
         public static bool Exists(UserContext context, String apiKey, String userName)
         {
-            throw new NotImplementedException();
+            foreach (User user in context.Users)
+            {
+                if (user.ApiKey.Equals(apiKey))
+                {
+                    return user.UserName.Equals(userName);
+                }
+            }
+
+            return false;
         }
 
         public static User Get(UserContext context, String apiKey)
