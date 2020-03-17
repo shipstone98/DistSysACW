@@ -42,7 +42,13 @@ namespace DistSysACW.Models
 
         public static async Task DeleteAsync(UserContext context, String apiKey)
         {
-            throw new NotImplementedException();
+            User userToDelete = UserDatabaseAccess.Get(context, apiKey);
+
+            if (!(userToDelete is null))
+            {
+                context.Users.Remove(userToDelete);
+                await context.SaveChangesAsync();
+            }
         }
 
         public static bool Exists(UserContext context, String apiKey) => !(UserDatabaseAccess.Get(context, apiKey) is null);
