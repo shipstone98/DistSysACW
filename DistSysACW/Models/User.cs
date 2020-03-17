@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace DistSysACW.Models
 {
@@ -17,8 +18,29 @@ namespace DistSysACW.Models
 
     public static class UserDatabaseAccess
     {
-        #region Task3 
-        // TODO: Make methods which allow us to read from/write to the database 
-        #endregion
+        public static async Task<User> CreateAsync(UserContext context, String userName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static async Task DeleteAsync(UserContext context, String apiKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool Exists(UserContext context, String apiKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool Exists(UserContext context, String apiKey, String userName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static User Get(UserContext context, String apiKey)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
