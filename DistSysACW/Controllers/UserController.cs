@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 using DistSysACW.Models;
@@ -41,7 +42,21 @@ namespace DistSysACW.Controllers
         [HttpPost]
         public async Task<IActionResult> NewAsync([FromBody] String userName)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrWhiteSpace(userName))
+            {
+                return this.BadRequest("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
+            }
+
+            foreach (User user in this.Context.Users)
+            {
+                if (user.UserName.Equals(userName))
+                {
+                    return this.StatusCode((int) HttpStatusCode.Forbidden, "Oops. This username is already in use. Please try again with a new username.");
+                }
+            }
+
+            User createdUser = await UserDatabaseAccess.CreateAsync(this.Context, userName);
+            return this.Ok(createdUser.ApiKey);
         }
     }
 }
