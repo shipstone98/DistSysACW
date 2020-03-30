@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 using DistSysACW.Models;
@@ -14,6 +17,18 @@ namespace DistSysACW.Controllers
     public class ProtectedController : BaseController
     {
         public ProtectedController(UserContext context) : base(context) { }
+
+        private static String ConvertByteArrayToString(byte[] arr)
+        {
+            StringBuilder sb = new StringBuilder(arr.Length * 2);
+
+            foreach (byte b in arr)
+            {
+                sb.AppendFormat("{0:x2}", b);
+            }
+
+            return sb.ToString();
+        }
 
         [ActionName("Hello")]
         [HttpGet]
@@ -27,7 +42,15 @@ namespace DistSysACW.Controllers
         [HttpGet]
         public IActionResult SHA1([FromQuery] String message)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(message))
+            {
+                return this.BadRequest("Bad Request");
+            }
+
+            SHA1 provider = new SHA1CryptoServiceProvider();
+            byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
+            byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
+            return this.Ok(ProtectedController.ConvertByteArrayToString(encryptedMessage));
         }
 
         [ActionName("SHA256")]
