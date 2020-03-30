@@ -57,7 +57,15 @@ namespace DistSysACW.Controllers
         [HttpGet]
         public IActionResult SHA256([FromQuery] String message)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(message))
+            {
+                return this.BadRequest("Bad Request");
+            }
+
+            SHA256 provider = new SHA256CryptoServiceProvider();
+            byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
+            byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
+            return this.Ok(ProtectedController.ConvertByteArrayToString(encryptedMessage));
         }
     }
 }
