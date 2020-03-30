@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
@@ -57,6 +58,25 @@ namespace DistSysACW.Controllers
 
             User createdUser = await UserDatabaseAccess.CreateAsync(this.Context, userName);
             return this.Ok(createdUser.ApiKey);
+        }
+
+        [ActionName("RemoveUser")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
+        public async Task<bool> RemoveUserAsync([FromHeader] String apiKey, [FromQuery] String userName)
+        {
+            if (String.IsNullOrWhiteSpace(apiKey) || String.IsNullOrWhiteSpace(userName))
+            {
+                return false;
+            }
+
+            if (UserDatabaseAccess.Exists(this.Context, apiKey, userName))
+            {
+                await UserDatabaseAccess.DeleteAsync(this.Context, apiKey);
+                return true;
+            }
+
+            return false;
         }
     }
 }
