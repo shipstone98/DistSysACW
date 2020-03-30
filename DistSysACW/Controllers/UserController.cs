@@ -19,6 +19,55 @@ namespace DistSysACW.Controllers
         /// <param name="context">DbContext set as a service in Startup.cs and dependency injected</param>
         public UserController(Models.UserContext context) : base(context) { }
 
+        [ActionName("ChangeRole")]
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> ChangeRole([FromHeader] String apiKey, [FromBody] User inputUser)
+        {
+
+
+            /*UserRole role;
+
+            try
+            {
+                role = (UserRole) Enum.Parse(typeof (UserRole), userName);
+            }
+
+            catch
+            {
+                return this.BadRequest("NOT DONE: Role does not exist");
+            }
+            */
+
+            User user = null;
+
+            foreach (User item in this.Context.Users)
+            {
+                if (item.UserName.Equals(inputUser.UserName))
+                {
+                    user = item;
+                    break;
+                }
+            }
+
+            if (user is null)
+            {
+                return this.BadRequest("NOT DONE: Username does not exist");
+            }
+
+            try
+            {
+                user.Role = inputUser.Role;
+                await this.Context.SaveChangesAsync();
+                return this.Ok("DONE");
+            }
+
+            catch
+            {
+                return this.BadRequest("NOT DONE: An error occured");
+            }
+        }
+
         [ActionName("New")]
         [HttpGet]
         public IActionResult New([FromQuery] String userName)
@@ -41,22 +90,22 @@ namespace DistSysACW.Controllers
 
         [ActionName("New")]
         [HttpPost]
-        public async Task<IActionResult> NewAsync([FromBody] String userName)
+        public async Task<IActionResult> NewAsync([FromBody] User userName)
         {
-            if (String.IsNullOrWhiteSpace(userName))
+            if (userName is null || String.IsNullOrWhiteSpace(userName.UserName))
             {
                 return this.BadRequest("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
             }
 
             foreach (User user in this.Context.Users)
             {
-                if (user.UserName.Equals(userName))
+                if (user.UserName.Equals(userName.UserName))
                 {
                     return this.StatusCode((int) HttpStatusCode.Forbidden, "Oops. This username is already in use. Please try again with a new username.");
                 }
             }
 
-            User createdUser = await UserDatabaseAccess.CreateAsync(this.Context, userName);
+            User createdUser = await UserDatabaseAccess.CreateAsync(this.Context, userName.UserName);
             return this.Ok(createdUser.ApiKey);
         }
 
