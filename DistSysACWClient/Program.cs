@@ -106,6 +106,23 @@ namespace DistSysACWClient
 								break;
 
 							case "user":
+								switch (split[1].ToLower())
+								{
+									case "get":
+										String response = await client.UserGetAsync(split[2]);
+
+										if (response is null)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										Console.WriteLine(response);
+										break;
+
+									default:
+										throw new IndexOutOfRangeException();
+								}
+
 								break;
 							default:
 								throw new IndexOutOfRangeException();

@@ -209,5 +209,21 @@ namespace DistSysACWClient
 				return null;
 			}
 		}
+
+		public async Task<String> UserGetAsync(String userName)
+		{
+			if (userName is null)
+			{
+				throw new ArgumentNullException(nameof (userName));
+			}
+
+			if (String.IsNullOrWhiteSpace(userName))
+			{
+				throw new ArgumentException(nameof (userName));
+			}
+
+			HttpResponseMessage response = await this.HttpClient.GetAsync($"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/new?username={userName}");
+			return response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : null;
+		}
 	}
 }
