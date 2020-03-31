@@ -5,7 +5,8 @@ namespace DistSysACWClient
 {
 	internal static class Program
 	{
-		private const String URI = "https://localhost:5001";
+		private const String URI = "https://localhost:44307";
+		private const String WaitingMessage = "...please wait...";
 
 		private static String GetInput() => Program.GetInput(null);
 
@@ -24,14 +25,11 @@ namespace DistSysACWClient
 
 		private static async Task<int> Main(String[] args)
 		{
-			bool exit = false;
-			String input = Program.GetInput("Hello. What would you like to do?");
-			Console.TreatControlCAsInput = false;
-			Console.CancelKeyPress += new ConsoleCancelEventHandler((sender, e) => exit = true);
+			String input = Program.GetInput("Hello. What would you like to do? ");
 
 			using (Client client = new Client(Program.URI))
 			{
-				do
+				while (true)
 				{
 					String[] split = input.Split(' ');
 
@@ -41,12 +39,26 @@ namespace DistSysACWClient
 						{
 							case "exit":
 							case "quit":
-								exit = true;
-								break;
+								goto break_loop;
 							case "protected":
 								break;
+
 							case "talkback":
+								switch (split[1].ToLower())
+								{
+									case "hello":
+										Task<String> task = client.GetTalkBackHelloAsync();
+										Console.WriteLine(Program.WaitingMessage);
+										Console.WriteLine(await task);
+										break;
+									case "split":
+										break;
+									default:
+										throw new IndexOutOfRangeException();
+								}
+
 								break;
+
 							case "user":
 								break;
 							default:
@@ -59,11 +71,12 @@ namespace DistSysACWClient
 						Console.WriteLine("ERROR: invalid input");
 					}
 
-					input = Program.GetInput("What would you like to do next?");
+					input = Program.GetInput("What would you like to do next? ");
 					Console.Clear();
-				} while (!exit);
+				}
 			}
 
+		break_loop:
 			return 0;
 		}
 	}

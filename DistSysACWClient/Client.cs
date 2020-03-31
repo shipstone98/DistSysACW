@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DistSysACWClient
@@ -123,6 +121,18 @@ namespace DistSysACWClient
 				this.HttpClient.Dispose();
 				this.AreUnmanagedDisposed = true;
 			}
+		}
+
+		public async Task<String> GetTalkBackHelloAsync()
+		{
+			if (this.AreUnmanagedDisposed)
+			{
+				throw new ObjectDisposedException(nameof (this.HttpClient));
+			}
+
+			String uri = this.HttpClient.BaseAddress.AbsoluteUri;
+			HttpResponseMessage response = await this.HttpClient.GetAsync(uri + "api/talkback/hello");
+			return await response.Content.ReadAsStringAsync();
 		}
 	}
 }
