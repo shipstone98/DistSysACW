@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DistSysACWClient
@@ -133,6 +135,79 @@ namespace DistSysACWClient
 			String uri = this.HttpClient.BaseAddress.AbsoluteUri;
 			HttpResponseMessage response = await this.HttpClient.GetAsync(uri + "api/talkback/hello");
 			return await response.Content.ReadAsStringAsync();
+		}
+
+		public async Task<int[]> GetTalkBackSortAsync(String arr)
+		{
+			if (arr is null)
+			{
+				throw new ArgumentNullException(nameof (arr));
+			}
+
+			if (String.IsNullOrWhiteSpace(arr))
+			{
+				throw new ArgumentException(nameof (arr));
+			}
+
+			String[] split = arr.Replace("[", "").Replace("]", "").Split(',');
+			int[] input = new int[split.Length];
+
+			try
+			{
+				for (int i = 0; i < split.Length; i ++)
+				{
+					input[i] = Int32.Parse(split[i]);
+				}
+
+				return await this.GetTalkBackSortAsync(input);
+			}
+
+			catch
+			{
+				return null;
+			}
+		}
+
+		public async Task<int[]> GetTalkBackSortAsync(IEnumerable<int> arr)
+		{
+			if (this.AreUnmanagedDisposed)
+			{
+				throw new ObjectDisposedException(nameof (this.HttpClient));
+			}
+
+			if (arr is null)
+			{
+				throw new ArgumentNullException(nameof (arr));
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			foreach (int item in arr)
+			{
+				sb.Append($"integers={item}&");
+			}
+
+			sb.Remove(sb.Length - 1, 1);
+			String m = sb.ToString();
+			HttpResponseMessage response = await this.HttpClient.GetAsync($"{this.HttpClient.BaseAddress.AbsoluteUri}api/talkback/sort?{sb}");
+
+			try
+			{
+				String[] split = (await response.Content.ReadAsStringAsync()).Replace("[", "").Replace("]", "").Split(',');
+				int[] output = new int[split.Length];
+
+				for (int i = 0; i < split.Length; i ++)
+				{
+					output[i] = Int32.Parse(split[i]);
+				}
+
+				return output;
+			}
+
+			catch
+			{
+				return null;
+			}
 		}
 	}
 }

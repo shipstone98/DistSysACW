@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DistSysACWClient
@@ -47,12 +48,57 @@ namespace DistSysACWClient
 								switch (split[1].ToLower())
 								{
 									case "hello":
+									{
 										Task<String> task = client.GetTalkBackHelloAsync();
 										Console.WriteLine(Program.WaitingMessage);
 										Console.WriteLine(await task);
 										break;
-									case "split":
+									}
+
+									case "sort":
+									{
+										Task<int[]> task;
+
+										if (split[2].StartsWith("["))
+										{
+											task = client.GetTalkBackSortAsync(String.Join(' ', split, 2, split.Length - 2));
+										}
+
+										else
+										{
+											int[] arr = new int[split.Length - 2];
+
+											for (int i = 2; i < split.Length; i++)
+											{
+												arr[i] = Int32.Parse(split[i]);
+											}
+
+											task = client.GetTalkBackSortAsync(arr);
+										}
+
+										Console.WriteLine(Program.WaitingMessage);
+										int[] sortedArray = await task;
+
+										if (sortedArray is null)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										StringBuilder sb = new StringBuilder();
+										sb.Append('[');
+
+										foreach (int item in sortedArray)
+										{
+											sb.Append(item + ",");
+										}
+
+										sb.Remove(sb.Length - 1, 1);
+										sb.Append(']');
+										Console.WriteLine(sb.ToString());
+
 										break;
+									}
+
 									default:
 										throw new IndexOutOfRangeException();
 								}
