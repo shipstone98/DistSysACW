@@ -19,7 +19,7 @@ namespace DistSysACW.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=DistSysACW;");
+            optionsBuilder.UseSqlite("Data Source=DistSysACW.db;");
         }
     }
 }
