@@ -19,7 +19,7 @@ namespace DistSysACW.Filters
 
                 if (authAttribute != null)
                 {
-                    /*String[] roles = authAttribute.Roles.Split(',');
+                    String[] roles = authAttribute.Roles.Split(',');
 
                     foreach (String role in roles)
                     {
@@ -27,12 +27,12 @@ namespace DistSysACW.Filters
                         {
                             return;
                         }
-                    }*/
+                    }
 
-                    if (context.HttpContext.User.IsInRole(UserRole.Admin.ToString()))
+                    /*if (context.HttpContext.User.IsInRole(UserRole.Admin.ToString()))
                     {
                         return;
-                    }
+                    }*/
 
                     throw new UnauthorizedAccessException();
                 }

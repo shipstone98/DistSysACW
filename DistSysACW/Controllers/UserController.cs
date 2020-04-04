@@ -110,7 +110,7 @@ namespace DistSysACW.Controllers
         }
 
         [ActionName("RemoveUser")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,User")]
         [HttpDelete]
         public async Task<bool> RemoveUserAsync([FromHeader] String apiKey, [FromQuery] String userName)
         {
