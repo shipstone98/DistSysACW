@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 using Newtonsoft.Json;
 
@@ -144,6 +145,33 @@ namespace DistSysACWClient
 			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
 			return await response.Content.ReadAsStringAsync();
 		}
+
+		private async Task<String> ProtectedMessageAsync(String apiKey, String message, String encryption)
+		{
+			if (apiKey is null)
+			{
+				throw new ArgumentNullException(nameof (apiKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(apiKey))
+			{
+				throw new ArgumentException(nameof (apiKey));
+			}
+
+			if (message is null)
+			{
+				message = String.Empty;
+			}
+
+			String encodedMessage = HttpUtility.UrlEncode(message);
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/protected/{encryption}?message={encodedMessage}");
+			request.Headers.Add("ApiKey", apiKey);
+			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+			return await response.Content.ReadAsStringAsync();
+		}
+
+		public async Task<String> ProtectedSha1Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha1");
+		public async Task<String> ProtectedSha256Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha256");
 
 		public async Task<String> GetTalkBackHelloAsync()
 		{

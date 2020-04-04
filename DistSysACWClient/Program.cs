@@ -63,10 +63,47 @@ namespace DistSysACWClient
 										}
 
 										break;
+
 									case "sha1":
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else
+										{
+											if (split.Length == 2)
+											{
+												throw new IndexOutOfRangeException();
+											}
+
+											Task<String> task = client.ProtectedSha1Async(Program.ApiKey, String.Join(' ', split, 2, split.Length - 2));
+											Console.WriteLine(Program.WaitingMessage);
+											Console.WriteLine(await task);
+										}
+
 										break;
+
 									case "sha256":
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else
+										{
+											if (split.Length == 2)
+											{
+												throw new IndexOutOfRangeException();
+											}
+											
+											Task<String> task = client.ProtectedSha256Async(Program.ApiKey, String.Join(' ', split, 2, split.Length - 2));
+											Console.WriteLine(Program.WaitingMessage);
+											Console.WriteLine(await task);
+										}
+
 										break;
+
 									default:
 										throw new IndexOutOfRangeException();
 								}
