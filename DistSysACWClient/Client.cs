@@ -212,6 +212,34 @@ namespace DistSysACWClient
 			}
 		}
 
+		public async Task<bool> UserDeleteAsync(String apiKey, String userName)
+		{
+			if (apiKey is null)
+			{
+				throw new ArgumentNullException(nameof (apiKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(apiKey))
+			{
+				throw new ArgumentException(nameof (apiKey));
+			}
+
+			if (userName is null)
+			{
+				throw new ArgumentNullException(nameof (userName));
+			}
+
+			if (String.IsNullOrWhiteSpace(userName))
+			{
+				throw new ArgumentException(nameof (userName));
+			}
+
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/removeuser?userName={userName}");
+			request.Headers.Add("ApiKey", apiKey);
+			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+			return Boolean.TryParse(await response.Content.ReadAsStringAsync(), out bool result) ? result : false;
+		}
+
 		public async Task<String> UserGetAsync(String userName)
 		{
 			if (userName is null)

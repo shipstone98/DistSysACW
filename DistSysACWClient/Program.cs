@@ -111,6 +111,24 @@ namespace DistSysACWClient
 							case "user":
 								switch (split[1].ToLower())
 								{
+									case "delete":
+									{
+										if (Program.ApiKey is null || Program.UserName is null)
+										{
+											Console.WriteLine("You need to do a User Post or User set first.");
+										}
+
+										else
+										{
+											Task<bool> responseTask = client.UserDeleteAsync(Program.ApiKey, Program.UserName);
+											Console.WriteLine(Program.WaitingMessage);
+											bool response = await responseTask;
+											Console.WriteLine(response ? "True" : "False");
+										}
+
+										break;
+									}
+
 									case "get":
 									{
 										Task<String> responseTask = client.UserGetAsync(split[2]);
