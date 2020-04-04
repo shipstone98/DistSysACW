@@ -6,8 +6,11 @@ namespace DistSysACWClient
 {
 	internal static class Program
 	{
-		private const String URI = "https://localhost:44307";
+		private const String URI = "https://localhost:5001";
 		private const String WaitingMessage = "...please wait...";
+
+		private static String ApiKey = null;
+		private static String UserName = null;
 
 		private static String GetInput() => Program.GetInput(null);
 
@@ -109,7 +112,10 @@ namespace DistSysACWClient
 								switch (split[1].ToLower())
 								{
 									case "get":
-										String response = await client.UserGetAsync(split[2]);
+									{
+										Task<String> responseTask = client.UserGetAsync(split[2]);
+										Console.WriteLine(Program.WaitingMessage);
+										String response = await responseTask;
 
 										if (response is null)
 										{
@@ -117,6 +123,45 @@ namespace DistSysACWClient
 										}
 
 										Console.WriteLine(response);
+										break;
+									}
+
+									case "post":
+									{
+										if (split.Length > 3)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										Task<String> responseTask = client.UserPostAsync(split[2]);
+										Console.WriteLine(Program.WaitingMessage);
+										String response = await responseTask;
+
+										if (response.StartsWith("Oops"))
+										{
+											Console.WriteLine(response);
+										}
+
+										else
+										{
+											Program.ApiKey = response;
+											Program.UserName = split[2];
+											Console.WriteLine("Got API Key");
+										}
+
+										break;
+									}
+
+									case "set":
+										if (split.Length > 4)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										Program.UserName = split[2];
+										Program.ApiKey = split[3];
+										Console.WriteLine("Stored");
+
 										break;
 
 									default:

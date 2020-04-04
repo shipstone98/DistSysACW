@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+
 namespace DistSysACWClient
 {
 	public class Client: IDisposable
@@ -224,6 +226,29 @@ namespace DistSysACWClient
 
 			HttpResponseMessage response = await this.HttpClient.GetAsync($"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/new?username={userName}");
 			return response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : null;
+		}
+
+		public async Task<String> UserPostAsync(String userName)
+		{
+			if (userName is null)
+			{
+				throw new ArgumentNullException(nameof (userName));
+			}
+
+			if (String.IsNullOrWhiteSpace(userName))
+			{
+				throw new ArgumentException(nameof (userName));
+			}
+
+			User user = new User
+			{
+				UserName = userName
+			};
+
+			String userJson = JsonConvert.SerializeObject(user);
+			StringContent content = new StringContent(userJson, Encoding.UTF8, "application/json");
+			HttpResponseMessage response = await this.HttpClient.PostAsync($"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/new", content);
+			return await response.Content.ReadAsStringAsync();
 		}
 	}
 }
