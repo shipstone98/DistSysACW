@@ -6,6 +6,7 @@ namespace DistSysACWClient
 {
 	internal static class Program
 	{
+		private const String UserSetupMessage = "You need to do a User Post or User Set first";
 		private const String URI = "https://localhost:5001";
 		private const String WaitingMessage = "...please wait...";
 
@@ -44,7 +45,32 @@ namespace DistSysACWClient
 							case "exit":
 							case "quit":
 								goto break_loop;
+
 							case "protected":
+								switch (split[1].ToLower())
+								{
+									case "hello":
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else
+										{
+											Task<String> task = client.ProtectedHelloAsync(Program.ApiKey);
+											Console.WriteLine(Program.WaitingMessage);
+											Console.WriteLine(await task);
+										}
+
+										break;
+									case "sha1":
+										break;
+									case "sha256":
+										break;
+									default:
+										throw new IndexOutOfRangeException();
+								}
+
 								break;
 
 							case "talkback":
@@ -115,7 +141,7 @@ namespace DistSysACWClient
 									{
 										if (Program.ApiKey is null || Program.UserName is null)
 										{
-											Console.WriteLine("You need to do a User Post or User set first.");
+											Console.WriteLine(Program.UserSetupMessage);
 										}
 
 										else
@@ -174,7 +200,7 @@ namespace DistSysACWClient
 									{
 										if (Program.ApiKey is null)
 										{
-											Console.WriteLine("You need to do a User Post or User Set first");
+											Console.WriteLine(Program.UserSetupMessage);
 										}
 
 										else

@@ -127,6 +127,24 @@ namespace DistSysACWClient
 			}
 		}
 
+		public async Task<String> ProtectedHelloAsync(String apiKey)
+		{
+			if (apiKey is null)
+			{
+				throw new ArgumentNullException(nameof (apiKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(apiKey))
+			{
+				throw new ArgumentException(nameof (apiKey));
+			}
+
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/protected/hello");
+			request.Headers.Add("ApiKey", apiKey);
+			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+			return await response.Content.ReadAsStringAsync();
+		}
+
 		public async Task<String> GetTalkBackHelloAsync()
 		{
 			if (this.AreUnmanagedDisposed)
