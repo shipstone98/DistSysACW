@@ -212,6 +212,52 @@ namespace DistSysACWClient
 			}
 		}
 
+		public async Task<String> UserChangeRoleAsync(String apiKey, String userName, String role)
+		{
+			if (apiKey is null)
+			{
+				throw new ArgumentNullException(nameof (apiKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(apiKey))
+			{
+				throw new ArgumentException(nameof (apiKey));
+			}
+
+			if (userName is null)
+			{
+				throw new ArgumentNullException(nameof (userName));
+			}
+
+			if (String.IsNullOrWhiteSpace(userName))
+			{
+				throw new ArgumentException(nameof (userName));
+			}
+
+			if (role is null)
+			{
+				throw new ArgumentNullException(nameof (role));
+			}
+
+			if (String.IsNullOrWhiteSpace(role))
+			{
+				throw new ArgumentException(nameof (role));
+			}
+
+			User user = new User
+			{
+				Role = role,
+				UserName = userName
+			};
+
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/changerole");
+			request.Headers.Add("ApiKey", apiKey);
+			String userJson = JsonConvert.SerializeObject(user);
+			request.Content = new StringContent(userJson, Encoding.UTF8, "application/json");
+			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+			return await response.Content.ReadAsStringAsync();
+		}
+
 		public async Task<bool> UserDeleteAsync(String apiKey, String userName)
 		{
 			if (apiKey is null)

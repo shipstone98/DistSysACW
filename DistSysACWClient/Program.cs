@@ -170,6 +170,42 @@ namespace DistSysACWClient
 										break;
 									}
 
+									case "role":
+									{
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine("You need to do a User Post or User Set first");
+										}
+
+										else
+										{
+											if (split.Length > 4)
+											{
+												throw new IndexOutOfRangeException();
+											}
+
+											String role;
+
+											switch (split[3].ToLower())
+											{
+												case "admin":
+													role = "Admin";
+													break;
+												case "user":
+													role = "User";
+													break;
+												default:
+													throw new IndexOutOfRangeException();
+											}
+
+											Task<String> responseTask = client.UserChangeRoleAsync(Program.ApiKey, split[2], role);
+											Console.WriteLine(Program.WaitingMessage);
+											Console.WriteLine(await responseTask);
+										}
+
+										break;
+									}
+
 									case "set":
 										if (split.Length > 4)
 										{
@@ -179,7 +215,6 @@ namespace DistSysACWClient
 										Program.UserName = split[2];
 										Program.ApiKey = split[3];
 										Console.WriteLine("Stored");
-
 										break;
 
 									default:
