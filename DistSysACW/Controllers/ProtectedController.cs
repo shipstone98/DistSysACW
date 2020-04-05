@@ -71,5 +71,9 @@ namespace DistSysACW.Controllers
             byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
             return this.Ok(ProtectedController.ConvertByteArrayToString(encryptedMessage));
         }
+
+        [ActionName("Sign")]
+        [HttpGet]
+        public IActionResult Sign([FromHeader] String apiKey, [FromQuery] String message) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.SignMessage(message)) : this.BadRequest();
     }
 }
