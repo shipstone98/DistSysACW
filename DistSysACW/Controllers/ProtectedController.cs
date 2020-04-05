@@ -30,6 +30,10 @@ namespace DistSysACW.Controllers
             return sb.ToString();
         }
 
+        [ActionName("GetPublicKey")]
+        [HttpGet]
+        public IActionResult GetPublicKey([FromHeader] String apiKey) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.PublicKey) : this.NotFound();
+
         [ActionName("Hello")]
         [HttpGet]
         public IActionResult Hello([FromHeader] String apiKey)
