@@ -8,9 +8,12 @@ namespace DistSysACWClient
 	{
 		private const String UserSetupMessage = "You need to do a User Post or User Set first";
 		private const String URI = "https://localhost:5001";
+		//private const String URI = "http://distsysacw.azurewebsites.net/3978094";
 		private const String WaitingMessage = "...please wait...";
 
 		private static String ApiKey = null;
+		private static String PublicKey = null;
+		
 		private static String UserName = null;
 
 		private static String GetInput() => Program.GetInput(null);
@@ -42,6 +45,15 @@ namespace DistSysACWClient
 					{
 						switch (split[0].ToLower())
 						{
+							case "connect":
+							{
+								Task<Exception> task = client.ConnectAsync();
+								Console.WriteLine(Program.WaitingMessage);
+								Exception taskException = await task;
+								Console.WriteLine(taskException is null ? "Connected successfully" : taskException.ToString());
+								break;
+							}
+							
 							case "exit":
 							case "quit":
 								goto break_loop;
@@ -49,6 +61,37 @@ namespace DistSysACWClient
 							case "protected":
 								switch (split[1].ToLower())
 								{
+									case "get":
+										if (split[2].ToLower() != "publickey" || split.Length > 3)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else
+										{
+											Task<String> task = client.ProtectedGetPublicKeyAsync(Program.ApiKey);
+											Console.WriteLine(Program.WaitingMessage);
+											String publicKey = await task;
+
+											if (publicKey is null)
+											{
+												Console.WriteLine("Couldn't get the Public Key");
+											}
+
+											else
+											{
+												Program.PublicKey = publicKey;
+												Console.WriteLine("Got Public Key");
+											}
+										}
+
+										break;
+
 									case "hello":
 										if (Program.ApiKey is null)
 										{
