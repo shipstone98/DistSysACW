@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,8 +10,14 @@ namespace DistSysACW.Models
     {
         [Key]
         public String ApiKey { get; set; }
+        public ICollection<Log> Logs { get; set; }
         public UserRole Role { get; set; }
         public String UserName { get; set; }
+
+        public User()
+        {
+            this.Logs = new List<Log>();
+        }
     }
 
     #region Task13?
@@ -46,6 +53,15 @@ namespace DistSysACW.Models
 
             if (!(userToDelete is null))
             {
+                foreach (Log log in userToDelete.Logs)
+                {
+                    LogArchive archive = (LogArchive) log.Clone();
+                    archive.ApiKey = apiKey;
+                    context.Logs.Remove(log);
+                    context.LogArchive.Add(archive);
+                }
+
+                userToDelete.Logs.Clear();
                 context.Users.Remove(userToDelete);
                 await context.SaveChangesAsync();
             }

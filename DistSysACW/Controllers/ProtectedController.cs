@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,10 +28,22 @@ namespace DistSysACW.Controllers
 
         [ActionName("Hello")]
         [HttpGet]
-        public IActionResult Hello([FromHeader] String apiKey)
+        public async Task<IActionResult> HelloAsync([FromHeader] String apiKey)
         {
             User user = UserDatabaseAccess.Get(this.Context, apiKey);
-            return user is null ? (IActionResult) this.BadRequest("ERROR: user not found") : this.Ok($"Hello {user.UserName}");
+
+            if (user is null)
+            {
+                return this.BadRequest("ERROR: user not found");
+            }
+            
+            else
+            {
+                String name = this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template;
+                user.Logs.Add(new Log(name));
+                await this.Context.SaveChangesAsync();
+                return this.Ok($"Hello {user.UserName}");
+            }
         }
 
         [ActionName("SHA1")]

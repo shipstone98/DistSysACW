@@ -24,21 +24,9 @@ namespace DistSysACW.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangeRole([FromHeader] String apiKey, [FromBody] User inputUser)
         {
-
-
-            /*UserRole role;
-
-            try
-            {
-                role = (UserRole) Enum.Parse(typeof (UserRole), userName);
-            }
-
-            catch
-            {
-                return this.BadRequest("NOT DONE: Role does not exist");
-            }
-            */
-
+            User admin = UserDatabaseAccess.Get(this.Context, apiKey);
+            admin.Logs.Add(new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template));
+            Task awaiter = this.Context.SaveChangesAsync();
             User user = null;
 
             foreach (User item in this.Context.Users)
@@ -49,6 +37,8 @@ namespace DistSysACW.Controllers
                     break;
                 }
             }
+
+            await awaiter;
 
             if (user is null)
             {
@@ -119,8 +109,11 @@ namespace DistSysACW.Controllers
                 return false;
             }
 
-            if (UserDatabaseAccess.Exists(this.Context, apiKey, userName))
+            User user = UserDatabaseAccess.Get(this.Context, apiKey);
+
+            if (!(user is null) && user.UserName == userName)
             {
+                user.Logs.Add(new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template));
                 await UserDatabaseAccess.DeleteAsync(this.Context, apiKey);
                 return true;
             }
