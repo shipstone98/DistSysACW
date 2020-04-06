@@ -26,6 +26,10 @@ namespace DistSysACW.Controllers
             return sb.ToString();
         }
 
+        [ActionName("GetPublicKey")]
+        [HttpGet]
+        public IActionResult GetPublicKey([FromHeader] String apiKey) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.PublicKey) : this.NotFound();
+
         [ActionName("Hello")]
         [HttpGet]
         public async Task<IActionResult> HelloAsync([FromHeader] String apiKey)
@@ -75,5 +79,9 @@ namespace DistSysACW.Controllers
             byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
             return this.Ok(ProtectedController.ConvertByteArrayToString(encryptedMessage));
         }
+
+        [ActionName("Sign")]
+        [HttpGet]
+        public IActionResult Sign([FromHeader] String apiKey, [FromQuery] String message) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.SignMessage(message)) : this.BadRequest();
     }
 }

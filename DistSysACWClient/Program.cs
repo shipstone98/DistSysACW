@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+
+using CoreExtensions;
 
 namespace DistSysACWClient
 {
@@ -8,10 +11,13 @@ namespace DistSysACWClient
 	{
 		private const String UserSetupMessage = "You need to do a User Post or User Set first";
 		private const String URI = "https://localhost:5001";
+		//private const String URI = "http://distsysacw.azurewebsites.net/3978094";
 		private const String WaitingMessage = "...please wait...";
 
-		private static String ApiKey = null;
-		private static String UserName = null;
+		private static String ApiKey = "06356a9f-f7a2-4228-a722-e5ac48e6832a";
+		private static String PublicKey = null;
+		
+		private static String UserName = "UserOne";
 
 		private static String GetInput() => Program.GetInput(null);
 
@@ -42,6 +48,15 @@ namespace DistSysACWClient
 					{
 						switch (split[0].ToLower())
 						{
+							case "connect":
+							{
+								Task<Exception> task = client.ConnectAsync();
+								Console.WriteLine(Program.WaitingMessage);
+								Exception taskException = await task;
+								Console.WriteLine(taskException is null ? "Connected successfully" : taskException.ToString());
+								break;
+							}
+							
 							case "exit":
 							case "quit":
 								goto break_loop;
@@ -49,6 +64,37 @@ namespace DistSysACWClient
 							case "protected":
 								switch (split[1].ToLower())
 								{
+									case "get":
+										if (split[2].ToLower() != "publickey" || split.Length > 3)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else
+										{
+											Task<String> task = client.ProtectedGetPublicKeyAsync(Program.ApiKey);
+											Console.WriteLine(Program.WaitingMessage);
+											String publicKey = await task;
+
+											if (publicKey is null)
+											{
+												Console.WriteLine("Couldn't get the Public Key");
+											}
+
+											else
+											{
+												Program.PublicKey = publicKey;
+												Console.WriteLine("Got Public Key");
+											}
+										}
+
+										break;
+
 									case "hello":
 										if (Program.ApiKey is null)
 										{
@@ -100,6 +146,44 @@ namespace DistSysACWClient
 											Task<String> task = client.ProtectedSha256Async(Program.ApiKey, String.Join(' ', split, 2, split.Length - 2));
 											Console.WriteLine(Program.WaitingMessage);
 											Console.WriteLine(await task);
+										}
+
+										break;
+
+									case "sign":
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else if (Program.PublicKey is null)
+										{
+											Console.WriteLine("Client doesn't yet have the public key");
+										}
+
+										else
+										{
+											if (split.Length == 2)
+											{
+												throw new IndexOutOfRangeException();
+											}
+											
+											String message = String.Join(' ', split, 2, split.Length - 2);
+											Task<String> task = client.ProtectedSignAsync(Program.ApiKey, message);
+											Console.WriteLine(Program.WaitingMessage);
+											RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+											rsa.FromXmlStringCore22(Program.PublicKey);
+											byte[] originalBytes = Encoding.ASCII.GetBytes(message);
+											String messageWithoutDashes = (await task).Replace("-", "");
+											byte[] signedBytes = new byte[messageWithoutDashes.Length / 2];
+
+											for (int i = 0; i < signedBytes.Length; i ++)
+											{
+												signedBytes[i] = Convert.ToByte(messageWithoutDashes.Substring(i * 2, 2), 16);
+											}
+
+											bool signed = rsa.VerifyData(originalBytes, signedBytes, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
+											Console.WriteLine(signed ? "Message was successfully signed" : "Message was not successfully signed");
 										}
 
 										break;

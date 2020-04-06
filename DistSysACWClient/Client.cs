@@ -113,6 +113,21 @@ namespace DistSysACWClient
 			this._UserName = userName;
 		}
 
+		public async Task<Exception> ConnectAsync()
+		{
+			try
+			{
+				HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Options, this.HttpClient.BaseAddress.AbsoluteUri);
+				await this.HttpClient.SendAsync(request);
+				return null;
+			}
+
+			catch (Exception ex)
+			{
+				return ex;
+			}
+		}
+
 		public void Dispose()
 		{
 			this.Dispose(true);
@@ -126,6 +141,24 @@ namespace DistSysACWClient
 				this.HttpClient.Dispose();
 				this.AreUnmanagedDisposed = true;
 			}
+		}
+
+		public async Task<String> ProtectedGetPublicKeyAsync(String apiKey)
+		{
+			if (apiKey is null)
+			{
+				throw new ArgumentNullException(nameof (apiKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(apiKey))
+			{
+				throw new ArgumentException(nameof (apiKey));
+			}
+
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/protected/getpublickey");
+			request.Headers.Add("ApiKey", apiKey);
+			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+			return await response.Content.ReadAsStringAsync();
 		}
 
 		public async Task<String> ProtectedHelloAsync(String apiKey)
@@ -172,6 +205,7 @@ namespace DistSysACWClient
 
 		public async Task<String> ProtectedSha1Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha1");
 		public async Task<String> ProtectedSha256Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha256");
+		public async Task<String> ProtectedSignAsync(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sign");
 
 		public async Task<String> GetTalkBackHelloAsync()
 		{
@@ -345,7 +379,7 @@ namespace DistSysACWClient
 			}
 
 			HttpResponseMessage response = await this.HttpClient.GetAsync($"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/new?username={userName}");
-			return response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : null;
+			return await response.Content.ReadAsStringAsync();
 		}
 
 		public async Task<String> UserPostAsync(String userName)
