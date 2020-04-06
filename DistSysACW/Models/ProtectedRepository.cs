@@ -20,8 +20,7 @@ namespace DistSysACW.Models
             }
 
             byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
-            SHA1 sha1Provider = new SHA1CryptoServiceProvider();
-            byte[] signedMessage = ProtectedRepository.RSA.SignData(asciiMessage, sha1Provider);
+            byte[] signedMessage = ProtectedRepository.RSA.SignData(asciiMessage, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
             String[] signedHexMessage = new String[signedMessage.Length];
             
             for (int i = 0; i < signedMessage.Length; i ++)
