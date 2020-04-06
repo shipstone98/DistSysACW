@@ -205,6 +205,7 @@ namespace DistSysACWClient
 
 		public async Task<String> ProtectedSha1Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha1");
 		public async Task<String> ProtectedSha256Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha256");
+		public async Task<String> ProtectedSignAsync(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sign");
 
 		public async Task<String> GetTalkBackHelloAsync()
 		{
