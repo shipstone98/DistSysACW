@@ -18,11 +18,26 @@ namespace DistSysACW.Controllers
         public String Get() => "Hello World";
 
         [ActionName("Sort")]
-        public IActionResult Get([FromQuery] int[] integers)
+        public IActionResult Get([FromQuery(Name = "integers")] String[] integerStrings)
         {
-            if (integers.Length == 0)
+            if (integerStrings.Length == 0)
             {
                 return this.Ok("[]");
+            }
+
+            int[] integers = new int[integerStrings.Length];
+
+            for (int i = 0; i < integerStrings.Length; i ++)
+            {
+                try
+                {
+                    integers[i] = Int32.Parse(integerStrings[i]);
+                }
+
+                catch
+                {
+                    return this.BadRequest();
+                }
             }
 
             List<int> sortedIntegers = new List<int>(integers);
