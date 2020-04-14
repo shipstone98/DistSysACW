@@ -36,7 +36,7 @@ namespace DistSysACW.Controllers
 
                 catch
                 {
-                    return this.BadRequest();
+                    return this.BadRequest("Bad Request");
                 }
             }
 
