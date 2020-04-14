@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+
+using Newtonsoft.Json;
 
 using DistSysACW.Models;
 
@@ -80,22 +83,72 @@ namespace DistSysACW.Controllers
 
         [ActionName("New")]
         [HttpPost]
-        public async Task<IActionResult> NewAsync([FromBody] User userName)
+        public async Task<IActionResult> NewAsync()
         {
-            if (userName is null || String.IsNullOrWhiteSpace(userName.UserName))
+            const String emptyMessage = "Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json";
+            String body;
+
+            using (StreamReader sr = new StreamReader(this.Request.Body))
             {
-                return this.BadRequest("Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json");
+                body = await sr.ReadToEndAsync();
+            }
+
+            if (String.IsNullOrWhiteSpace(body) || !body.ToLower().StartsWith("\"username\":"))
+            {
+                return this.BadRequest(emptyMessage);
+            }
+
+            body = $"{{{body}}}";
+            String userName = null;
+
+            using (TextReader tr = new StringReader(body))
+            {
+                using (JsonReader jr = new JsonTextReader(tr))
+                {
+                    bool active = false;
+
+                    try
+                    {
+                        while (await jr.ReadAsync())
+                        {
+                            if (jr.TokenType == JsonToken.PropertyName)
+                            {
+                                String value = jr.Value.ToString();
+                                active = value.ToLower() == "username";
+                            }
+
+                            else if (jr.TokenType == JsonToken.String)
+                            {
+                                if (active)
+                                {
+                                    userName = jr.Value.ToString();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    catch
+                    {
+                        userName = null;
+                    }
+                }
+            }
+
+            if (String.IsNullOrWhiteSpace(userName))
+            {
+                return this.BadRequest(emptyMessage);
             }
 
             foreach (User user in this.Context.Users)
             {
-                if (user.UserName.Equals(userName.UserName))
+                if (user.UserName.Equals(userName))
                 {
                     return this.StatusCode((int) HttpStatusCode.Forbidden, "Oops. This username is already in use. Please try again with a new username.");
                 }
             }
 
-            User createdUser = await UserDatabaseAccess.CreateAsync(this.Context, userName.UserName);
+            User createdUser = await UserDatabaseAccess.CreateAsync(this.Context, userName);
             return this.Ok(createdUser.ApiKey);
         }
 
