@@ -55,8 +55,7 @@ namespace DistSysACW.Models
             {
                 foreach (Log log in userToDelete.Logs)
                 {
-                    LogArchive archive = (LogArchive) log.Clone();
-                    archive.ApiKey = apiKey;
+                    LogArchive archive = new LogArchive(log, apiKey);
                     context.Logs.Remove(log);
                     context.LogArchive.Add(archive);
                 }

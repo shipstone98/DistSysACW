@@ -2,7 +2,7 @@ using System;
 
 namespace DistSysACW.Models
 {
-    public class Log: ICloneable
+    public class Log
     {
         public DateTime LogDateTime { get; set; }
         public String LogId { get; set; }
@@ -16,14 +16,11 @@ namespace DistSysACW.Models
             this.LogString = logString ?? "";
         }
 
-        public Object Clone()
+        protected internal Log(Log log)
         {
-            return new Log
-            {
-                LogDateTime = this.LogDateTime,
-                LogId = this.LogId,
-                LogString = this.LogString
-            };
+            this.LogDateTime = log.LogDateTime;
+            this.LogId = log.LogId ?? Guid.NewGuid().ToString();
+            this.LogString = log.LogString ?? String.Empty;
         }
     }
 }
