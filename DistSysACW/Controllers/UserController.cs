@@ -13,8 +13,8 @@ namespace DistSysACW.Controllers
 {
     public class UserController : BaseController
     {
-        private const String FalseString = "False - User Does Not Exist! Did you mean to do a POST to create a new user?";
-        private const String TrueString = "True - User Does Exist! Did you mean to do a POST to create a new user?";
+        private const String FalseString = "\"False - User Does Not Exist! Did you mean to do a POST to create a new user?\"";
+        private const String TrueString = "\"True - User Does Exist! Did you mean to do a POST to create a new user?\"";
 
         /// <summary>
         /// Constructs a User controller, taking the UserContext through dependency injection
@@ -155,11 +155,11 @@ namespace DistSysACW.Controllers
         [ActionName("RemoveUser")]
         [Authorize(Roles = "Admin,User")]
         [HttpDelete]
-        public async Task<bool> RemoveUserAsync([FromHeader] String apiKey, [FromQuery] String userName)
+        public async Task<IActionResult> RemoveUserAsync([FromHeader] String apiKey, [FromQuery] String userName)
         {
             if (String.IsNullOrWhiteSpace(apiKey) || String.IsNullOrWhiteSpace(userName))
             {
-                return false;
+                return this.Ok(false);
             }
 
             User user = UserDatabaseAccess.Get(this.Context, apiKey);
@@ -168,10 +168,10 @@ namespace DistSysACW.Controllers
             {
                 user.Logs.Add(new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template));
                 await UserDatabaseAccess.DeleteAsync(this.Context, apiKey);
-                return true;
+                return this.Ok(true);
             }
 
-            return false;
+            return this.Ok(false);
         }
     }
 }
