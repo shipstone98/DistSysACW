@@ -21,11 +21,25 @@ namespace DistSysACW.Filters
                 {
                     String[] roles = authAttribute.Roles.Split(',');
 
-                    foreach (String role in roles)
+                    if (roles.Length == 1)
                     {
-                        if (context.HttpContext.User.IsInRole(role))
+                        if (!context.HttpContext.User.IsInRole(roles[0]))
                         {
-                            return;
+                            context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                            context.Result = new JsonResult("Unauthorized. Admin access only.");
+                        }
+
+                        return;
+                    }
+
+                    else
+                    {
+                        foreach (String role in roles)
+                        {
+                            if (context.HttpContext.User.IsInRole(role))
+                            {
+                                return;
+                            }
                         }
                     }
 
@@ -41,7 +55,7 @@ namespace DistSysACW.Filters
             catch
             {
                 context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
-                context.Result = new JsonResult("Unauthorized. Admin access only.");
+                context.Result = new JsonResult("Unauthorized. Check ApiKey in Header is correct.");
             }
         }
     }
