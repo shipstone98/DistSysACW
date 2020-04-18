@@ -44,7 +44,9 @@ namespace DistSysACW.Controllers
             else
             {
                 String name = this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template;
-                user.Logs.Add(new Log(name));
+                Log log = new Log(name);
+                user.Logs.Add(log);
+                this.Context.Logs.Add(log);
                 await this.Context.SaveChangesAsync();
                 return this.Ok($"Hello {user.UserName}");
             }
@@ -82,6 +84,6 @@ namespace DistSysACW.Controllers
 
         [ActionName("Sign")]
         [HttpGet]
-        public IActionResult Sign([FromHeader] String apiKey, [FromQuery] String message) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.SignMessage(message)) : this.BadRequest();
+        public async Task<IActionResult> SignAsync([FromHeader] String apiKey, [FromQuery] String message) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(await ProtectedRepository.SignMessageAsync(this.Context, apiKey, message, this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template)) : this.BadRequest("Bad Request");
     }
 }

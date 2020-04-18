@@ -5,8 +5,6 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json;
-
 using DistSysACW.Models;
 
 namespace DistSysACW.Controllers
@@ -28,7 +26,9 @@ namespace DistSysACW.Controllers
         public async Task<IActionResult> ChangeRole([FromHeader] String apiKey, [FromBody] User inputUser)
         {
             User admin = UserDatabaseAccess.Get(this.Context, apiKey);
-            admin.Logs.Add(new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template));
+            Log log = new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template);
+            admin.Logs.Add(log);
+            this.Context.Logs.Add(log);
             Task awaiter = this.Context.SaveChangesAsync();
             User user = null;
 
@@ -83,57 +83,16 @@ namespace DistSysACW.Controllers
 
         [ActionName("New")]
         [HttpPost]
-        public async Task<IActionResult> NewAsync()
+        public async Task<IActionResult> NewAsync([FromBody] String userName)
         {
             const String emptyMessage = "Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json";
-            String body;
 
-            using (StreamReader sr = new StreamReader(this.Request.Body))
-            {
-                body = await sr.ReadToEndAsync();
-            }
-
-            if (String.IsNullOrWhiteSpace(body) || !body.ToLower().StartsWith("\"username\":"))
+            if (userName is null)
             {
                 return this.BadRequest(emptyMessage);
             }
 
-            body = $"{{{body}}}";
-            String userName = null;
-
-            using (TextReader tr = new StringReader(body))
-            {
-                using (JsonReader jr = new JsonTextReader(tr))
-                {
-                    bool active = false;
-
-                    try
-                    {
-                        while (await jr.ReadAsync())
-                        {
-                            if (jr.TokenType == JsonToken.PropertyName)
-                            {
-                                String value = jr.Value.ToString();
-                                active = value.ToLower() == "username";
-                            }
-
-                            else if (jr.TokenType == JsonToken.String)
-                            {
-                                if (active)
-                                {
-                                    userName = jr.Value.ToString();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    catch
-                    {
-                        userName = null;
-                    }
-                }
-            }
+            userName = userName.TrimEnd('"').TrimStart('"');
 
             if (String.IsNullOrWhiteSpace(userName))
             {
@@ -166,7 +125,9 @@ namespace DistSysACW.Controllers
 
             if (!(user is null) && user.UserName == userName)
             {
-                user.Logs.Add(new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template));
+                Log log = new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template);
+                user.Logs.Add(log);
+                this.Context.Logs.Add(log);
                 await UserDatabaseAccess.DeleteAsync(this.Context, apiKey);
                 return this.Ok(true);
             }

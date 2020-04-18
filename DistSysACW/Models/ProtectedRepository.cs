@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 using CoreExtensions;
 
@@ -12,11 +13,29 @@ namespace DistSysACW.Models
 
         public static String PublicKey => ProtectedRepository.RSA.ToXmlStringCore22();
 
-        public static String SignMessage(String message)
+        public static async Task<String> SignMessageAsync(UserContext context, String apiKey, String message, String name)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof (context));
+            }
+
             if (message is null)
             {
                 throw new ArgumentNullException(nameof (message));
+            }
+
+            if (!String.IsNullOrWhiteSpace(apiKey))
+            {
+                User user = UserDatabaseAccess.Get(context, apiKey);
+
+                if (!(user is null))
+                {
+                    Log log = new Log(name);
+                    user.Logs.Add(log);
+                    context.Logs.Add(log);
+                    await context.SaveChangesAsync();
+                }
             }
 
             byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
