@@ -8,10 +8,36 @@ namespace DistSysACW.Models
 {
     public class User
     {
+        public const String AdminRole = "Admin";
+        public const String UserRole = "User";
+
+        public bool IsRoleCorrect
+        {
+            get
+            {
+                if (this.Role is null)
+                {
+                    return false;
+                }
+
+                switch (this.Role.Trim().ToLower())
+                {
+                    case "admin":
+                        this.Role = "Admin";
+                        return true;
+                    case "user":
+                        this.Role = "User";
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+        
         [Key]
         public String ApiKey { get; set; }
         public ICollection<Log> Logs { get; set; }
-        public UserRole Role { get; set; }
+        public String Role { get; set; }
         public String UserName { get; set; }
 
         public User()
@@ -38,7 +64,7 @@ namespace DistSysACW.Models
             User user = new User
             {
                 ApiKey = id,
-                Role = context.Users.Count() == 0 ? UserRole.Admin : UserRole.User,
+                Role = context.Users.Count() == 0 ? User.AdminRole : User.UserRole,
                 UserName = userName
             };
 

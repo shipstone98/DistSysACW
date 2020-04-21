@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,16 +15,37 @@ namespace DistSysACW.Controllers
     {
         public ProtectedController(UserContext context) : base(context) { }
 
-        private static String ConvertByteArrayToString(byte[] arr)
+        [ActionName("AddFifty")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult AddFifty([FromHeader] String apiKey, [FromQuery] String encryptedInteger, [FromQuery] String encryptedSymKey, [FromQuery] String encryptedIV)
         {
-            StringBuilder sb = new StringBuilder(arr.Length * 2);
+            const String badRequestMessage = "Bad Request";
+            User user = null;
 
-            foreach (byte b in arr)
+            if (String.IsNullOrWhiteSpace(apiKey) || String.IsNullOrWhiteSpace(encryptedInteger) || String.IsNullOrWhiteSpace(encryptedSymKey) || String.IsNullOrWhiteSpace(encryptedIV) || (user = UserDatabaseAccess.Get(this.Context, apiKey)) is null)
             {
-                sb.AppendFormat("{0:x2}", b);
+                return this.BadRequest(badRequestMessage);
             }
 
-            return sb.ToString();
+            try
+            {
+                String decryptedInteger = ProtectedRepository.Decrypt(encryptedInteger);
+                long integer = Int64.Parse(decryptedInteger);
+                String decryptedSymKey = ProtectedRepository.Decrypt(encryptedSymKey);
+                String decryptedIV = ProtectedRepository.Decrypt(encryptedIV);
+                integer += 50;
+                String encryptedFifty = ProtectedRepository.Encrypt(integer.ToString());
+                Log log = new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template);
+                user.Logs.Add(log);
+                this.Context.SaveChangesAsync();
+                return this.Ok(encryptedFifty);
+            }
+            
+            catch
+            {
+                return this.BadRequest(badRequestMessage);
+            }
         }
 
         [ActionName("GetPublicKey")]
@@ -31,6 +53,7 @@ namespace DistSysACW.Controllers
         public IActionResult GetPublicKey([FromHeader] String apiKey) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.PublicKey) : this.NotFound();
 
         [ActionName("Hello")]
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
         public async Task<IActionResult> HelloAsync([FromHeader] String apiKey)
         {
@@ -53,33 +76,65 @@ namespace DistSysACW.Controllers
         }
 
         [ActionName("SHA1")]
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
-        public IActionResult SHA1([FromQuery] String message)
+        public async Task<IActionResult> SHA1Async([FromHeader] String apiKey, [FromQuery] String message)
         {
-            if (String.IsNullOrEmpty(message))
+            if (String.IsNullOrWhiteSpace(apiKey) || String.IsNullOrEmpty(message))
             {
                 return this.BadRequest("Bad Request");
             }
 
-            SHA1 provider = new SHA1CryptoServiceProvider();
-            byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
-            byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
-            return this.Ok(ProtectedController.ConvertByteArrayToString(encryptedMessage));
+            User user = UserDatabaseAccess.Get(this.Context, apiKey);
+
+            if (user is null)
+            {
+                return this.BadRequest("ERROR: user not found");
+            }
+            
+            else
+            {
+                String name = this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template;
+                Log log = new Log(name);
+                user.Logs.Add(log);
+                this.Context.Logs.Add(log);
+                await this.Context.SaveChangesAsync();
+                SHA1 provider = new SHA1CryptoServiceProvider();
+                byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
+                byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
+                return this.Ok(ProtectedRepository.ConvertByteArrayToString(encryptedMessage));
+            }
         }
 
         [ActionName("SHA256")]
+        [Authorize(Roles = "Admin,User")]
         [HttpGet]
-        public IActionResult SHA256([FromQuery] String message)
+        public async Task<IActionResult> SHA256Async([FromHeader] String apiKey, [FromQuery] String message)
         {
-            if (String.IsNullOrEmpty(message))
+            if (String.IsNullOrWhiteSpace(apiKey) || String.IsNullOrEmpty(message))
             {
                 return this.BadRequest("Bad Request");
             }
 
-            SHA256 provider = new SHA256CryptoServiceProvider();
-            byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
-            byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
-            return this.Ok(ProtectedController.ConvertByteArrayToString(encryptedMessage));
+            User user = UserDatabaseAccess.Get(this.Context, apiKey);
+
+            if (user is null)
+            {
+                return this.BadRequest("ERROR: user not found");
+            }
+            
+            else
+            {
+                String name = this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template;
+                Log log = new Log(name);
+                user.Logs.Add(log);
+                this.Context.Logs.Add(log);
+                await this.Context.SaveChangesAsync();
+                SHA256 provider = new SHA256CryptoServiceProvider();
+                byte[] asciiMessage = Encoding.ASCII.GetBytes(message);
+                byte[] encryptedMessage = provider.ComputeHash(asciiMessage);
+                return this.Ok(ProtectedRepository.ConvertByteArrayToString(encryptedMessage));
+            }
         }
 
         [ActionName("Sign")]

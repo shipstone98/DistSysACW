@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -23,13 +22,12 @@ namespace DistSysACW.Controllers
         [ActionName("ChangeRole")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> ChangeRole([FromHeader] String apiKey, [FromBody] User inputUser)
+        public async Task<IActionResult> ChangeRoleAsync([FromHeader] String apiKey, [FromBody] User inputUser)
         {
             User admin = UserDatabaseAccess.Get(this.Context, apiKey);
             Log log = new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template);
             admin.Logs.Add(log);
             this.Context.Logs.Add(log);
-            Task awaiter = this.Context.SaveChangesAsync();
             User user = null;
 
             foreach (User item in this.Context.Users)
@@ -41,8 +39,6 @@ namespace DistSysACW.Controllers
                 }
             }
 
-            await awaiter;
-
             if (user is null)
             {
                 return this.BadRequest("NOT DONE: Username does not exist");
@@ -50,6 +46,11 @@ namespace DistSysACW.Controllers
 
             try
             {
+                if (!inputUser.IsRoleCorrect)
+                {
+                    return this.BadRequest("NOT DONE: Role does not exist");
+                }
+
                 user.Role = inputUser.Role;
                 await this.Context.SaveChangesAsync();
                 return this.Ok("DONE");

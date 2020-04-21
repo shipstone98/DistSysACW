@@ -143,6 +143,54 @@ namespace DistSysACWClient
 			}
 		}
 
+		public async Task<String> ProtectedAddFiftyAsync(String apiKey, String integer, String symKey, String iv)
+		{
+			if (apiKey is null)
+			{
+				throw new ArgumentNullException(nameof (apiKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(apiKey))
+			{
+				throw new ArgumentException(nameof (apiKey));
+			}
+
+			if (integer is null)
+			{
+				throw new ArgumentNullException(nameof (integer));
+			}
+
+			if (String.IsNullOrWhiteSpace(integer))
+			{
+				throw new ArgumentException(nameof (integer));
+			}
+
+			if (symKey is null)
+			{
+				throw new ArgumentNullException(nameof (symKey));
+			}
+
+			if (String.IsNullOrWhiteSpace(symKey))
+			{
+				throw new ArgumentException(nameof (symKey));
+			}
+
+			if (iv is null)
+			{
+				throw new ArgumentNullException(nameof (iv));
+			}
+
+			if (String.IsNullOrWhiteSpace(iv))
+			{
+				throw new ArgumentException(nameof (iv));
+			}
+
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/protected/addfifty?encryptedInteger={integer}&encryptedSymKey={symKey}&encryptedIV={iv}");
+			request.Headers.Add("ApiKey", apiKey);
+			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+			return await response.Content.ReadAsStringAsync();
+		}
+
 		public async Task<String> ProtectedGetPublicKeyAsync(String apiKey)
 		{
 			if (apiKey is null)
@@ -207,7 +255,7 @@ namespace DistSysACWClient
 		public async Task<String> ProtectedSha256Async(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sha256");
 		public async Task<String> ProtectedSignAsync(String apiKey, String message) => await this.ProtectedMessageAsync(apiKey, message, "sign");
 
-		public async Task<String> GetTalkBackHelloAsync()
+		public async Task<String> TalkBackHelloAsync()
 		{
 			if (this.AreUnmanagedDisposed)
 			{
@@ -219,7 +267,7 @@ namespace DistSysACWClient
 			return await response.Content.ReadAsStringAsync();
 		}
 
-		public async Task<int[]> GetTalkBackSortAsync(String arr)
+		public async Task<int[]> TalkBackSortAsync(String arr)
 		{
 			if (arr is null)
 			{
@@ -241,7 +289,7 @@ namespace DistSysACWClient
 					input[i] = Int32.Parse(split[i]);
 				}
 
-				return await this.GetTalkBackSortAsync(input);
+				return await this.TalkBackSortAsync(input);
 			}
 
 			catch
@@ -250,7 +298,7 @@ namespace DistSysACWClient
 			}
 		}
 
-		public async Task<int[]> GetTalkBackSortAsync(IEnumerable<int> arr)
+		public async Task<int[]> TalkBackSortAsync(IEnumerable<int> arr)
 		{
 			if (this.AreUnmanagedDisposed)
 			{
@@ -394,13 +442,7 @@ namespace DistSysACWClient
 				throw new ArgumentException(nameof (userName));
 			}
 
-			User user = new User
-			{
-				UserName = userName
-			};
-
-			String userJson = JsonConvert.SerializeObject(user);
-			StringContent content = new StringContent(userJson, Encoding.UTF8, "application/json");
+			StringContent content = new StringContent($"\"{userName}\"", Encoding.UTF8, "application/json");
 			HttpResponseMessage response = await this.HttpClient.PostAsync($"{this.HttpClient.BaseAddress.AbsoluteUri}api/user/new", content);
 			return await response.Content.ReadAsStringAsync();
 		}

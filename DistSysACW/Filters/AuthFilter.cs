@@ -43,7 +43,7 @@ namespace DistSysACW.Filters
                         }
                     }
 
-                    /*if (context.HttpContext.User.IsInRole(UserRole.Admin.ToString()))
+                    /*if (context.HttpContext.User.IsInRole(User.AdminRole.ToString()))
                     {
                         return;
                     }*/

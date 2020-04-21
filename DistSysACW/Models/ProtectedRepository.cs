@@ -13,6 +13,32 @@ namespace DistSysACW.Models
 
         public static String PublicKey => ProtectedRepository.RSA.ToXmlStringCore22();
 
+        public static String ConvertByteArrayToString(byte[] arr)
+        {
+            StringBuilder sb = new StringBuilder(arr.Length * 2);
+
+            foreach (byte b in arr)
+            {
+                sb.AppendFormat("{0:x2}", b);
+            }
+
+            return sb.ToString();
+        }
+
+        public static String Decrypt(String encryptedString)
+        {
+            byte[] encryptedBytes = Encoding.ASCII.GetBytes(encryptedString.Replace("-", ""));
+            byte[] decryptedBytes = ProtectedRepository.RSA.Decrypt(encryptedBytes, false);
+            return Encoding.ASCII.GetString(decryptedBytes);
+        }
+
+        public static String Encrypt(String decryptedString)
+        {
+            byte[] decryptedBytes = Encoding.ASCII.GetBytes(decryptedString);
+            byte[] encryptedBytes = ProtectedRepository.RSA.Encrypt(decryptedBytes, false);
+            return ProtectedRepository.ConvertByteArrayToString(encryptedBytes);
+        }
+
         public static async Task<String> SignMessageAsync(UserContext context, String apiKey, String message, String name)
         {
             if (context is null)

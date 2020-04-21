@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,15 +10,80 @@ namespace DistSysACWClient
 {
 	internal static class Program
 	{
+		private const String DefaultURI = "https://localhost:5001";
+		//private const String DefaultURI = "http://distsysacw.azurewebsites.net/3978094";
 		private const String UserSetupMessage = "You need to do a User Post or User Set first";
-		private const String URI = "https://localhost:5001";
-		//private const String URI = "http://distsysacw.azurewebsites.net/3978094";
 		private const String WaitingMessage = "...please wait...";
 
-		private static String ApiKey = "06356a9f-f7a2-4228-a722-e5ac48e6832a";
-		private static String PublicKey = null;
-		
-		private static String UserName = "UserOne";
+		private static String ApiKey = "57b8b9ce-1732-4cfa-863a-19378443fd42";
+		private static String PublicKey = null;		
+		private static String UserName = "DennisRitchie";
+
+        private static String ConvertByteArrayToString(byte[] arr)
+        {
+            StringBuilder sb = new StringBuilder(arr.Length * 2);
+
+            foreach (byte b in arr)
+            {
+                sb.AppendFormat("{0:x2}", b);
+            }
+
+            return sb.ToString();
+        }
+
+        private static String Decrypt(String encryptedString)
+        {
+            byte[] encryptedBytes = Encoding.ASCII.GetBytes(encryptedString.Replace("-", ""));
+			RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+			rsa.FromXmlStringCore22(Program.PublicKey);
+            byte[] decryptedBytes = rsa.Decrypt(encryptedBytes, false);
+            return Encoding.ASCII.GetString(decryptedBytes);
+        }
+
+		private static String DecryptAES(byte[] data, byte[] symKey, byte[] iv)
+		{
+			using (Aes aes = Aes.Create())
+			{
+				using (MemoryStream ms = new MemoryStream(data))
+				{
+					using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(aes.Key = symKey, aes.IV = iv), CryptoStreamMode.Read))
+					{
+						using (StreamReader sr = new StreamReader(cs))
+						{
+							return sr.ReadToEnd();
+						}
+					}
+				}
+			}
+		}
+
+        private static String Encrypt(String decryptedString)
+        {
+            byte[] decryptedBytes = Encoding.ASCII.GetBytes(decryptedString);
+			RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+			rsa.FromXmlStringCore22(Program.PublicKey);
+            byte[] encryptedBytes = rsa.Encrypt(decryptedBytes, false);
+            return Program.ConvertByteArrayToString(encryptedBytes);
+        }
+
+		private static byte[] EncryptAES(String data, byte[] symKey, byte[] iv)
+		{
+			using (Aes aes = Aes.Create())
+			{
+				using (MemoryStream ms = new MemoryStream())
+				{
+					using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(aes.Key = symKey, aes.IV = iv), CryptoStreamMode.Write))
+					{
+						using (StreamWriter sw = new StreamWriter(cs))
+						{
+							sw.Write(data);
+						}
+
+						return ms.ToArray();
+					}
+				}
+			}
+		}
 
 		private static String GetInput() => Program.GetInput(null);
 
@@ -38,7 +104,7 @@ namespace DistSysACWClient
 		{
 			String input = Program.GetInput("Hello. What would you like to do? ");
 
-			using (Client client = new Client(Program.URI))
+			using (Client client = new Client(Program.DefaultURI))
 			{
 				while (true)
 				{
@@ -64,6 +130,44 @@ namespace DistSysACWClient
 							case "protected":
 								switch (split[1].ToLower())
 								{
+									case "addfifty":
+										if (split.Length > 3)
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										if (!Int64.TryParse(split[2], out long integer))
+										{
+											Console.WriteLine("A valid integer must be given!");
+										}
+
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else if (Program.PublicKey is null)
+										{
+											Console.WriteLine("Client doesn't yet have the public key");
+										}
+
+										else
+										{
+											using (Aes aes = Aes.Create())
+											{
+												byte[] integerBytes = Encoding.ASCII.GetBytes(integer.ToString());
+												String integerString = Program.ConvertByteArrayToString(integerBytes);
+												byte[] encryptedInteger = Program.EncryptAES(integerString, aes.Key, aes.IV);
+												byte[] encryptedSymKey = Program.EncryptAES(Encoding.ASCII.GetString(aes.Key), aes.Key, aes.IV);
+												byte[] encryptedIV = Program.EncryptAES(Encoding.ASCII.GetString(aes.IV), aes.Key, aes.IV);
+												String response = await client.ProtectedAddFiftyAsync(Program.ApiKey, Encoding.ASCII.GetString(encryptedInteger), Encoding.ASCII.GetString(encryptedSymKey), Encoding.ASCII.GetString(encryptedIV));
+												String decryptedResponse = Program.DecryptAES(Encoding.ASCII.GetBytes(response.Replace("-", "")), aes.Key, aes.IV);
+												Console.WriteLine(Int64.TryParse(decryptedResponse, out long result) ? result.ToString() : "An error occurred!");
+											}
+										}
+
+										break;
+
 									case "get":
 										if (split[2].ToLower() != "publickey" || split.Length > 3)
 										{
@@ -199,7 +303,7 @@ namespace DistSysACWClient
 								{
 									case "hello":
 									{
-										Task<String> task = client.GetTalkBackHelloAsync();
+										Task<String> task = client.TalkBackHelloAsync();
 										Console.WriteLine(Program.WaitingMessage);
 										Console.WriteLine(await task);
 										break;
@@ -211,7 +315,7 @@ namespace DistSysACWClient
 
 										if (split[2].StartsWith("["))
 										{
-											task = client.GetTalkBackSortAsync(String.Join(' ', split, 2, split.Length - 2));
+											task = client.TalkBackSortAsync(String.Join(' ', split, 2, split.Length - 2));
 										}
 
 										else
@@ -223,7 +327,7 @@ namespace DistSysACWClient
 												arr[i] = Int32.Parse(split[i]);
 											}
 
-											task = client.GetTalkBackSortAsync(arr);
+											task = client.TalkBackSortAsync(arr);
 										}
 
 										Console.WriteLine(Program.WaitingMessage);

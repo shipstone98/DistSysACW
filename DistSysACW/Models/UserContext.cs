@@ -30,7 +30,7 @@ namespace DistSysACW.Models
             {
                 ApiKey = "06356a9f-f7a2-4228-a722-e5ac48e6832a",
                 Logs = new List<Log>(),
-                Role = UserRole.Admin,
+                Role = User.AdminRole,
                 UserName = "UserOne"
             });
         }
