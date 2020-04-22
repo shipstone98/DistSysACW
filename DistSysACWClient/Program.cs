@@ -63,6 +63,30 @@ namespace DistSysACWClient
 							case "protected":
 								switch (split[1].ToLower())
 								{
+									case "addfifty":
+										if (split.Length > 3 || !Int64.TryParse(split[2], out long result))
+										{
+											throw new IndexOutOfRangeException();
+										}
+
+										if (Program.ApiKey is null)
+										{
+											Console.WriteLine(Program.UserSetupMessage);
+										}
+
+										else if (Program.PublicKey is null)
+										{
+											Console.WriteLine("Client doesn't yet have the public key");
+										}
+
+										else
+										{
+											Task<String> task = client.ProtectedAddFiftyAsync(Program.ApiKey, result, Program.PublicKey);
+											Console.WriteLine(Program.WaitingMessage);
+											Console.WriteLine(await task);
+										}
+										
+										break;
 
 									case "get":
 										if (split[2].ToLower() != "publickey" || split.Length > 3)
@@ -171,7 +195,13 @@ namespace DistSysACWClient
 											String message = String.Join(' ', split, 2, split.Length - 2);
 											Task<String> task = client.ProtectedSignAsync(Program.ApiKey, message);
 											Console.WriteLine(Program.WaitingMessage);
-											RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+
+											CspParameters parameters = new CspParameters()
+											{
+												Flags = CspProviderFlags.UseMachineKeyStore
+											};
+
+											RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(parameters);
 											rsa.FromXmlStringCore22(Program.PublicKey);
 											byte[] originalBytes = Encoding.ASCII.GetBytes(message);
 											String messageWithoutDashes = (await task).Replace("-", "");

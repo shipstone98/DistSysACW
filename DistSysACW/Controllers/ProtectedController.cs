@@ -15,6 +15,46 @@ namespace DistSysACW.Controllers
     {
         public ProtectedController(UserContext context) : base(context) { }
 
+        [ActionName("AddFifty")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> AddFiftyAsync([FromHeader] String apiKey, [FromQuery] String encryptedInteger, [FromQuery] String encryptedSymKey, [FromQuery] String encryptedIV)
+        {
+            try
+            {
+                const long DIFFERENCE = 50;
+                byte[] encryptedIntegerBytes = ProtectedRepository.ConvertStringToByteArray(encryptedInteger);
+                byte[] encryptedSymKeyBytes = ProtectedRepository.ConvertStringToByteArray(encryptedSymKey);
+                byte[] encryptedIVBytes = ProtectedRepository.ConvertStringToByteArray(encryptedIV);
+                byte[] decryptedIntegerBytes = ProtectedRepository.DecryptRsa(encryptedIntegerBytes);
+                byte[] decryptedSymKeyBytes = ProtectedRepository.DecryptRsa(encryptedSymKeyBytes);
+                byte[] decryptedIVBytes = ProtectedRepository.DecryptRsa(encryptedIVBytes);
+                String integerString = Encoding.ASCII.GetString(decryptedIntegerBytes);
+                long integer = Int64.Parse(integerString);
+                byte[] encryptedResult;
+
+                using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+                {
+                    aes.Key = decryptedSymKeyBytes;
+                    aes.IV = decryptedIVBytes;
+                    encryptedResult = ProtectedRepository.EncryptAes((integer + DIFFERENCE).ToString(), aes);
+                }
+
+                String name = this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template;
+                Log log = new Log(name);
+                User user = UserDatabaseAccess.Get(this.Context, apiKey);
+                user.Logs.Add(log);
+                this.Context.Logs.Add(log);
+                await this.Context.SaveChangesAsync();
+                return this.Ok(ProtectedRepository.ConvertByteArrayToString(encryptedResult, true));
+            }
+
+            catch (Exception ex)
+            {
+                return this.BadRequest("Bad Request");
+            }
+        }
+
         [ActionName("GetPublicKey")]
         [HttpGet]
         public IActionResult GetPublicKey([FromHeader] String apiKey) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.PublicKey) : this.NotFound();

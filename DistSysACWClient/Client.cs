@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
+using CoreExtensions;
+
 using Newtonsoft.Json;
 
 namespace DistSysACWClient
@@ -131,6 +133,57 @@ namespace DistSysACWClient
 			}
 		}
 
+        private static String ConvertByteArrayToString(byte[] arr, bool dashes = false)
+        {
+            StringBuilder sb = new StringBuilder(arr.Length * 2);
+
+            foreach (byte b in arr)
+            {
+                sb.AppendFormat("{0:x2}", b);
+
+                if (dashes)
+                {
+                    sb.Append("-");
+                }
+            }
+
+            if (dashes)
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            return sb.ToString();
+        }
+
+        public static byte[] ConvertStringToByteArray(String data)
+        {
+            data = data.Replace("-", "");
+            byte[] dataBytes = new byte[data.Length / 2];
+
+            for (int i = 0; i < dataBytes.Length; i ++)
+            {
+                dataBytes[i] = Convert.ToByte(data.Substring(i * 2, 2), 16);
+            }
+
+            return dataBytes;
+        }
+
+		private static async Task<String> DecryptAesAsync(byte[] data, AesCryptoServiceProvider aes)
+		{
+			ICryptoTransform decryptor = aes.CreateDecryptor();
+
+			using (MemoryStream ms = new MemoryStream(data))
+			{
+				using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+				{
+					using (StreamReader sr = new StreamReader(cs))
+					{
+						return await sr.ReadToEndAsync();
+					}
+				}
+			}
+		}
+
 		public void Dispose()
 		{
 			this.Dispose(true);
@@ -143,6 +196,47 @@ namespace DistSysACWClient
 			{
 				this.HttpClient.Dispose();
 				this.AreUnmanagedDisposed = true;
+			}
+		}
+
+		public async Task<String> ProtectedAddFiftyAsync(String apiKey, long integer, String publicKey)
+		{
+			try
+			{
+				using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
+				{
+					aes.GenerateKey();
+					aes.GenerateIV();
+
+					CspParameters parameters = new CspParameters()
+					{
+						Flags = CspProviderFlags.UseMachineKeyStore
+					};
+
+					using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(parameters))
+					{
+						rsa.FromXmlStringCore22(publicKey);
+						const bool FOAEP = true;
+						byte[] encryptedIntegerBytes = rsa.Encrypt(Encoding.ASCII.GetBytes(integer.ToString()), FOAEP);
+						byte[] encryptedSymKeyBytes = rsa.Encrypt(aes.Key, FOAEP);
+						byte[] encryptedIVBytes = rsa.Encrypt(aes.IV, FOAEP);
+						String encryptedInteger = Client.ConvertByteArrayToString(encryptedIntegerBytes, true);
+						String encryptedSymKey = Client.ConvertByteArrayToString(encryptedSymKeyBytes, true);
+						String encryptedIV = Client.ConvertByteArrayToString(encryptedIVBytes, true);
+						HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/protected/addfifty?encryptedInteger={encryptedInteger}&encryptedSymKey={encryptedSymKey}&encryptedIV={encryptedIV}");
+						request.Headers.Add("ApiKey", apiKey);
+						HttpResponseMessage response = await this.HttpClient.SendAsync(request);
+						byte[] encryptedBodyBytes = Client.ConvertStringToByteArray(await response.Content.ReadAsStringAsync());
+						//Decrypt with AES to get integer - no ASCII converson involved  in server
+						String decryptedBody = await Client.DecryptAesAsync(encryptedBodyBytes, aes);
+						return Int64.Parse(decryptedBody).ToString();
+					}
+				}
+			}
+
+			catch (Exception ex)
+			{
+				return "An error occurred!";
 			}
 		}
 
