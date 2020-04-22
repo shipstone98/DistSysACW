@@ -1,0 +1,154 @@
+{
+	"id": "301d2fbe-6b6f-4695-8ee8-d090e357588f",
+	"name": "DistSysACW",
+	"values": [
+		{
+			"key": "remote_id",
+			"value": "3978094",
+			"enabled": true
+		},
+		{
+			"key": "local_port",
+			"value": "5001",
+			"enabled": true
+		},
+		{
+			"key": "clear",
+			"value": "Success, all data cleared.",
+			"enabled": true
+		},
+		{
+			"key": "task1_hello",
+			"value": "Hello World",
+			"enabled": true
+		},
+		{
+			"key": "task1_sort_good",
+			"value": "[2,5,8]",
+			"enabled": true
+		},
+		{
+			"key": "task1_sort_bad",
+			"value": "Bad Request",
+			"enabled": true
+		},
+		{
+			"key": "task1_sort_empty",
+			"value": "[]",
+			"enabled": true
+		},
+		{
+			"key": "task4_get_exists",
+			"value": "\"True - User Does Exist! Did you mean to do a POST to create a new user?\"",
+			"enabled": true
+		},
+		{
+			"key": "task4_get_not_exists",
+			"value": "\"False - User Does Not Exist! Did you mean to do a POST to create a new user?\"",
+			"enabled": true
+		},
+		{
+			"key": "task4_get_bad",
+			"value": "\"False - User Does Not Exist! Did you mean to do a POST to create a new user?\"",
+			"enabled": true
+		},
+		{
+			"key": "task4_post_bad",
+			"value": "Oops. Make sure your body contains a string with your username and your Content-Type is Content-Type:application/json",
+			"enabled": true
+		},
+		{
+			"key": "task4_post_taken",
+			"value": "Oops. This username is already in use. Please try again with a new username.",
+			"enabled": true
+		},
+		{
+			"key": "task7_remove_usertwo",
+			"value": "true",
+			"enabled": true
+		},
+		{
+			"key": "task7_remove_bad",
+			"value": "false",
+			"enabled": true
+		},
+		{
+			"key": "task7_remove_unauth",
+			"value": "\"Unauthorized. Check ApiKey in Header is correct.\"",
+			"enabled": true
+		},
+		{
+			"key": "task8_change_good",
+			"value": "DONE",
+			"enabled": true
+		},
+		{
+			"key": "task8_change_user_not_exists",
+			"value": "NOT DONE: Username does not exist",
+			"enabled": true
+		},
+		{
+			"key": "task8_change_role_not_exists",
+			"value": "NOT DONE: Role does not exist",
+			"enabled": true
+		},
+		{
+			"key": "task8_change_bad",
+			"value": "NOT DONE: An error occured",
+			"enabled": true
+		},
+		{
+			"key": "task9_hello",
+			"value": "Hello UserOne",
+			"enabled": true
+		},
+		{
+			"key": "task9_sha1_good",
+			"value": "AAF4C61DDCC5E8A2DABEDE0F3B482CD9AEA9434D",
+			"enabled": true
+		},
+		{
+			"key": "task9_sha1_bad",
+			"value": "Bad Request",
+			"enabled": true
+		},
+		{
+			"key": "task9_sha256_good",
+			"value": "2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824",
+			"enabled": true
+		},
+		{
+			"key": "task9_sha256_bad",
+			"value": "Bad Request",
+			"enabled": true
+		},
+		{
+			"key": "local_userone",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "remote_userone",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "local_usertwo",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "remote_usertwo",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "unauth_admin",
+			"value": "\"Unauthorized. Admin access only.\"",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2020-04-22T12:21:19.693Z",
+	"_postman_exported_using": "Postman/7.22.1"
+}

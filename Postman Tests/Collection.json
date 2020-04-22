@@ -1,0 +1,3228 @@
+{
+	"info": {
+		"_postman_id": "737d04b2-c5b3-48f8-b0d3-1c74b90528c7",
+		"name": "DistSysACW",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Local Clear",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6fb1ed93-38c7-4e33-b9e3-f4c91ddb4a0c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"clear\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/other/clear",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"other",
+						"clear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Clear",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6fb1ed93-38c7-4e33-b9e3-f4c91ddb4a0c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"clear\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/other/clear",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"other",
+						"clear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 1 Talkback Hello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1783dfc6-0e83-4217-ad82-97f16a95a7be",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task1_hello\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/talkback/hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"talkback",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 1 Talkback Hello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1783dfc6-0e83-4217-ad82-97f16a95a7be",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task1_hello\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/talkback/hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"talkback",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 1 Sort Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c39fcfac-a3e2-4e0b-b2c4-67a40903c868",
+						"exec": [
+							"var numbers = [];",
+							"var correct = true;",
+							"var message = pm.environment.get(\"task1_sort_bad\");",
+							"var size = pm.request.url.query.count();",
+							"",
+							"if (size === 0) {",
+							"    message = pm.environment.get(\"task1_sort_empty\");",
+							"}",
+							"",
+							"else {",
+							"    for (var i = 0; i < size; i ++) {",
+							"        var query = pm.request.url.query.idx(i);",
+							"        ",
+							"        if (query.key.toLowerCase() !== \"integers\") {",
+							"            continue;",
+							"        }",
+							"        ",
+							"        var parsed = parseInt(query.value);",
+							"        ",
+							"        if (isNaN(parsed)) {",
+							"            correct = false;",
+							"            break;",
+							"        }",
+							"        ",
+							"        numbers.push(parsed);",
+							"    }",
+							"    ",
+							"    if (correct && numbers.length > 0) {",
+							"        numbers.sort();",
+							"        message = \"[\";",
+							"        ",
+							"        for (var i = 0; i < numbers.length; i ++) {",
+							"            message += numbers[i] + \",\";",
+							"        }",
+							"        ",
+							"        message = message.substring(0, message.length - 1) + \"]\";",
+							"    }",
+							"}",
+							"",
+							"if (correct) {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"}",
+							"",
+							"else {",
+							"    pm.test(\"Status code is 400\", function () {",
+							"        pm.response.to.have.status(400);",
+							"    });",
+							"}",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(message);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/talkback/sort?integers=8&integers=2&integers=5",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"talkback",
+						"sort"
+					],
+					"query": [
+						{
+							"key": "integers",
+							"value": "8"
+						},
+						{
+							"key": "integers",
+							"value": "2"
+						},
+						{
+							"key": "integers",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 1 Sort Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c39fcfac-a3e2-4e0b-b2c4-67a40903c868",
+						"exec": [
+							"var numbers = [];",
+							"var correct = true;",
+							"var message = pm.environment.get(\"task1_sort_bad\");",
+							"var size = pm.request.url.query.count();",
+							"",
+							"if (size === 0) {",
+							"    message = pm.environment.get(\"task1_sort_empty\");",
+							"}",
+							"",
+							"else {",
+							"    for (var i = 0; i < size; i ++) {",
+							"        var query = pm.request.url.query.idx(i);",
+							"        ",
+							"        if (query.key.toLowerCase() !== \"integers\") {",
+							"            continue;",
+							"        }",
+							"        ",
+							"        var parsed = parseInt(query.value);",
+							"        ",
+							"        if (isNaN(parsed)) {",
+							"            correct = false;",
+							"            break;",
+							"        }",
+							"        ",
+							"        numbers.push(parsed);",
+							"    }",
+							"    ",
+							"    if (correct && numbers.length > 0) {",
+							"        numbers.sort();",
+							"        message = \"[\";",
+							"        ",
+							"        for (var i = 0; i < numbers.length; i ++) {",
+							"            message += numbers[i] + \",\";",
+							"        }",
+							"        ",
+							"        message = message.substring(0, message.length - 1) + \"]\";",
+							"    }",
+							"}",
+							"",
+							"if (correct) {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"}",
+							"",
+							"else {",
+							"    pm.test(\"Status code is 400\", function () {",
+							"        pm.response.to.have.status(400);",
+							"    });",
+							"}",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(message);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/talkback/sort?integers=8&integers=2&integers=5",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"talkback",
+						"sort"
+					],
+					"query": [
+						{
+							"key": "integers",
+							"value": "8"
+						},
+						{
+							"key": "integers",
+							"value": "2"
+						},
+						{
+							"key": "integers",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 1 Sort Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c39fcfac-a3e2-4e0b-b2c4-67a40903c868",
+						"exec": [
+							"var numbers = [];",
+							"var correct = true;",
+							"var message = pm.environment.get(\"task1_sort_bad\");",
+							"var size = pm.request.url.query.count();",
+							"",
+							"if (size === 0) {",
+							"    message = pm.environment.get(\"task1_sort_empty\");",
+							"}",
+							"",
+							"else {",
+							"    for (var i = 0; i < size; i ++) {",
+							"        var query = pm.request.url.query.idx(i);",
+							"        ",
+							"        if (query.key.toLowerCase() !== \"integers\") {",
+							"            continue;",
+							"        }",
+							"        ",
+							"        var parsed = parseInt(query.value);",
+							"        ",
+							"        if (isNaN(parsed)) {",
+							"            correct = false;",
+							"            break;",
+							"        }",
+							"        ",
+							"        numbers.push(parsed);",
+							"    }",
+							"    ",
+							"    if (correct && numbers.length > 0) {",
+							"        numbers.sort();",
+							"        message = \"[\";",
+							"        ",
+							"        for (var i = 0; i < numbers.length; i ++) {",
+							"            message += numbers[i] + \",\";",
+							"        }",
+							"        ",
+							"        message = message.substring(0, message.length - 1) + \"]\";",
+							"    }",
+							"}",
+							"",
+							"if (correct) {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"}",
+							"",
+							"else {",
+							"    pm.test(\"Status code is 400\", function () {",
+							"        pm.response.to.have.status(400);",
+							"    });",
+							"}",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(message);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/talkback/sort?integers=8&integers=2&integers=c",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"talkback",
+						"sort"
+					],
+					"query": [
+						{
+							"key": "integers",
+							"value": "8"
+						},
+						{
+							"key": "integers",
+							"value": "2"
+						},
+						{
+							"key": "integers",
+							"value": "c"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 1 Sort Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c39fcfac-a3e2-4e0b-b2c4-67a40903c868",
+						"exec": [
+							"var numbers = [];",
+							"var correct = true;",
+							"var message = pm.environment.get(\"task1_sort_bad\");",
+							"var size = pm.request.url.query.count();",
+							"",
+							"if (size === 0) {",
+							"    message = pm.environment.get(\"task1_sort_empty\");",
+							"}",
+							"",
+							"else {",
+							"    for (var i = 0; i < size; i ++) {",
+							"        var query = pm.request.url.query.idx(i);",
+							"        ",
+							"        if (query.key.toLowerCase() !== \"integers\") {",
+							"            continue;",
+							"        }",
+							"        ",
+							"        var parsed = parseInt(query.value);",
+							"        ",
+							"        if (isNaN(parsed)) {",
+							"            correct = false;",
+							"            break;",
+							"        }",
+							"        ",
+							"        numbers.push(parsed);",
+							"    }",
+							"    ",
+							"    if (correct && numbers.length > 0) {",
+							"        numbers.sort();",
+							"        message = \"[\";",
+							"        ",
+							"        for (var i = 0; i < numbers.length; i ++) {",
+							"            message += numbers[i] + \",\";",
+							"        }",
+							"        ",
+							"        message = message.substring(0, message.length - 1) + \"]\";",
+							"    }",
+							"}",
+							"",
+							"if (correct) {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"}",
+							"",
+							"else {",
+							"    pm.test(\"Status code is 400\", function () {",
+							"        pm.response.to.have.status(400);",
+							"    });",
+							"}",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(message);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/talkback/sort?integers=8&integers=2&integers=c",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"talkback",
+						"sort"
+					],
+					"query": [
+						{
+							"key": "integers",
+							"value": "8"
+						},
+						{
+							"key": "integers",
+							"value": "2"
+						},
+						{
+							"key": "integers",
+							"value": "c"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 1 Sort Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c39fcfac-a3e2-4e0b-b2c4-67a40903c868",
+						"exec": [
+							"var numbers = [];",
+							"var correct = true;",
+							"var message = pm.environment.get(\"task1_sort_bad\");",
+							"var size = pm.request.url.query.count();",
+							"",
+							"if (size === 0) {",
+							"    message = pm.environment.get(\"task1_sort_empty\");",
+							"}",
+							"",
+							"else {",
+							"    for (var i = 0; i < size; i ++) {",
+							"        var query = pm.request.url.query.idx(i);",
+							"        ",
+							"        if (query.key.toLowerCase() !== \"integers\") {",
+							"            continue;",
+							"        }",
+							"        ",
+							"        var parsed = parseInt(query.value);",
+							"        ",
+							"        if (isNaN(parsed)) {",
+							"            correct = false;",
+							"            break;",
+							"        }",
+							"        ",
+							"        numbers.push(parsed);",
+							"    }",
+							"    ",
+							"    if (correct && numbers.length > 0) {",
+							"        numbers.sort();",
+							"        message = \"[\";",
+							"        ",
+							"        for (var i = 0; i < numbers.length; i ++) {",
+							"            message += numbers[i] + \",\";",
+							"        }",
+							"        ",
+							"        message = message.substring(0, message.length - 1) + \"]\";",
+							"    }",
+							"}",
+							"",
+							"if (correct) {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"}",
+							"",
+							"else {",
+							"    pm.test(\"Status code is 400\", function () {",
+							"        pm.response.to.have.status(400);",
+							"    });",
+							"}",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(message);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/talkback/sort",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"talkback",
+						"sort"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 1 Sort Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c39fcfac-a3e2-4e0b-b2c4-67a40903c868",
+						"exec": [
+							"var numbers = [];",
+							"var correct = true;",
+							"var message = pm.environment.get(\"task1_sort_bad\");",
+							"var size = pm.request.url.query.count();",
+							"",
+							"if (size === 0) {",
+							"    message = pm.environment.get(\"task1_sort_empty\");",
+							"}",
+							"",
+							"else {",
+							"    for (var i = 0; i < size; i ++) {",
+							"        var query = pm.request.url.query.idx(i);",
+							"        ",
+							"        if (query.key.toLowerCase() !== \"integers\") {",
+							"            continue;",
+							"        }",
+							"        ",
+							"        var parsed = parseInt(query.value);",
+							"        ",
+							"        if (isNaN(parsed)) {",
+							"            correct = false;",
+							"            break;",
+							"        }",
+							"        ",
+							"        numbers.push(parsed);",
+							"    }",
+							"    ",
+							"    if (correct && numbers.length > 0) {",
+							"        numbers.sort();",
+							"        message = \"[\";",
+							"        ",
+							"        for (var i = 0; i < numbers.length; i ++) {",
+							"            message += numbers[i] + \",\";",
+							"        }",
+							"        ",
+							"        message = message.substring(0, message.length - 1) + \"]\";",
+							"    }",
+							"}",
+							"",
+							"if (correct) {",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"}",
+							"",
+							"else {",
+							"    pm.test(\"Status code is 400\", function () {",
+							"        pm.response.to.have.status(400);",
+							"    });",
+							"}",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(message);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/talkback/sort",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"talkback",
+						"sort"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Get False DennisRitchie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new?username=DennisRitchie",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "DennisRitchie"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Get False DennisRitchie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new?username=DennisRitchie",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "DennisRitchie"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Get False BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new?username=BrianKernighan",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Get False BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new?username=BrianKernighan",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Get Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Get Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Post DennisRitchie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"local_userone\", pm.response.text());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"DennisRitchie\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Post DennisRitchie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"remote_userone\", pm.response.text());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"DennisRitchie\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Post BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"local_usertwo\", pm.response.text());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"BrianKernighan\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Post BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"remote_usertwo\", pm.response.text());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"BrianKernighan\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Post Existing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_post_taken\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"BrianKernighan\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Post Existing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_post_taken\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"BrianKernighan\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Post Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_post_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Post Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_post_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Get True DennisRitchie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new?username=DennisRitchie",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "DennisRitchie"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Get True DennisRitchie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new?username=DennisRitchie",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "DennisRitchie"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 4 Get True BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new?username=BrianKernighan",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 4 Get True BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16ef9a8e-5bc3-4291-9dda-40cda28f165a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task4_get_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new?username=BrianKernighan",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 7 RemoveUser Brian Kernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0406299-9e3a-4fb7-ab79-fc7c6bf8447a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_usertwo\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "ApiKey",
+						"value": "{{local_usertwo}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/removeuser?username=BrianKernighan",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"removeuser"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 7 RemoveUser Brian Kernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0406299-9e3a-4fb7-ab79-fc7c6bf8447a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_usertwo\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_usertwo}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/removeuser?username=BrianKernighan",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"removeuser"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 7 RemoveUser Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0406299-9e3a-4fb7-ab79-fc7c6bf8447a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "ApiKey",
+						"value": "{{local_userone}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/removeuser?username=BrianKernighan",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"removeuser"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 7 RemoveUser Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0406299-9e3a-4fb7-ab79-fc7c6bf8447a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/removeuser?username=BrianKernighan",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"removeuser"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 7 RemoveUser Unauthorized",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0406299-9e3a-4fb7-ab79-fc7c6bf8447a",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "ApiKey",
+						"value": "{{local_usertwo}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/removeuser?username=BrianKernighan",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"removeuser"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 7 RemoveUser Unauthorized",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0406299-9e3a-4fb7-ab79-fc7c6bf8447a",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_usertwo}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/removeuser?username=BrianKernighan",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"removeuser"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "BrianKernighan"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 7 Undelete BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.environment.set(\"local_usertwo\", pm.response.text());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"BrianKernighan\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/new",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 7 Undelete BrianKernighan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1dadd3f2-39ae-41b7-bece-75596409b6a3",
+						"exec": [
+							"pm.environment.set(\"remote_usertwo\", pm.response.text());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"BrianKernighan\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/new",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 8 ChangeRole Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task8_change_good\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"value": "{{local_userone}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"BrianKernighan\",\n\t\"role\": \"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/changerole",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 8 ChangeRole Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task8_change_good\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"BrianKernighan\",\n\t\"role\": \"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/changerole",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 8 ChangeRole Bad Username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task8_change_user_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"KenThompson\",\n\t\"role\": \"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/changerole",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 8 ChangeRole Bad Username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task8_change_user_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"KenThompson\",\n\t\"role\": \"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/changerole",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 8 ChangeRole Bad Role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task8_change_role_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"value": "{{local_userone}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"BrianKernighan\",\n\t\"role\": \"LollipopMan\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/changerole",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 8 ChangeRole Bad Role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task8_change_role_not_exists\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"BrianKernighan\",\n\t\"role\": \"LollipopMan\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/changerole",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 8 ChangeRole Bad ApiKey",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"unauth_admin\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"BrianKernighan\",\n\t\"role\": \"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/user/changerole",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 8 ChangeRole Bad ApiKey",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e631f0ce-41d7-4706-8ea7-562832698613",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"unauth_admin\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userName\": \"BrianKernighan\",\n\t\"role\": \"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/user/changerole",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"user",
+						"changerole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected Hello Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(\"Hello DennisRitchie\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"value": "{{local_userone}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected Hello Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(\"Hello DennisRitchie\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected Hello Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected Hello Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected SHA1 Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.expect(pm.response.text()).to.match(/^[A-Fa-f0-9]+$/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/sha1?message=hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"sha1"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected SHA1 Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.expect(pm.response.text()).to.match(/^[A-Fa-f0-9]+$/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/sha1?message=hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"sha1"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected SHA1 Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task1_sort_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/sha1?message",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"sha1"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected SHA1 Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task1_sort_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/sha1?message",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"sha1"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected SHA1 Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/sha1?message=hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"sha1"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected SHA1 Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/sha1?message=hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"sha1"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected SHA256 Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.expect(pm.response.text()).to.match(/^[A-Fa-f0-9]+$/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/sha256?message=hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"sha256"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected SHA256 Good",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.expect(pm.response.text()).to.match(/^[A-Fa-f0-9]+$/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/sha256?message=hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"sha256"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected SHA256 Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task1_sort_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/sha256?message",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"sha256"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected SHA256 Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task1_sort_bad\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}"
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/sha256?message",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"sha256"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Local Task 9 Protected SHA256 Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c7dc91fe-3914-472c-878d-d5237633d81d",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{local_userone}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://localhost:{{local_port}}/api/protected/sha256?message=hello",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{local_port}}",
+					"path": [
+						"api",
+						"protected",
+						"sha256"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remote Task 9 Protected SHA256 Bad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2da8e429-30a4-445d-b392-9df0cd10692c",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(pm.environment.get(\"task7_remove_unauth\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ApiKey",
+						"type": "text",
+						"value": "{{remote_userone}}",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://distsysacw.azurewebsites.net/{{remote_id}}/api/protected/sha256?message=hello",
+					"protocol": "http",
+					"host": [
+						"distsysacw",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"{{remote_id}}",
+						"api",
+						"protected",
+						"sha256"
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
