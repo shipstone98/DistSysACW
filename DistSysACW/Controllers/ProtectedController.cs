@@ -15,39 +15,6 @@ namespace DistSysACW.Controllers
     {
         public ProtectedController(UserContext context) : base(context) { }
 
-        [ActionName("AddFifty")]
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public IActionResult AddFifty([FromHeader] String apiKey, [FromQuery] String encryptedInteger, [FromQuery] String encryptedSymKey, [FromQuery] String encryptedIV)
-        {
-            const String badRequestMessage = "Bad Request";
-            User user = null;
-
-            if (String.IsNullOrWhiteSpace(apiKey) || String.IsNullOrWhiteSpace(encryptedInteger) || String.IsNullOrWhiteSpace(encryptedSymKey) || String.IsNullOrWhiteSpace(encryptedIV) || (user = UserDatabaseAccess.Get(this.Context, apiKey)) is null)
-            {
-                return this.BadRequest(badRequestMessage);
-            }
-
-            try
-            {
-                String decryptedInteger = ProtectedRepository.Decrypt(encryptedInteger);
-                long integer = Int64.Parse(decryptedInteger);
-                String decryptedSymKey = ProtectedRepository.Decrypt(encryptedSymKey);
-                String decryptedIV = ProtectedRepository.Decrypt(encryptedIV);
-                integer += 50;
-                String encryptedFifty = ProtectedRepository.Encrypt(integer.ToString());
-                Log log = new Log(this.ControllerContext.ActionDescriptor.AttributeRouteInfo.Template);
-                user.Logs.Add(log);
-                this.Context.SaveChangesAsync();
-                return this.Ok(encryptedFifty);
-            }
-            
-            catch
-            {
-                return this.BadRequest(badRequestMessage);
-            }
-        }
-
         [ActionName("GetPublicKey")]
         [HttpGet]
         public IActionResult GetPublicKey([FromHeader] String apiKey) => UserDatabaseAccess.Exists(this.Context, apiKey) ? (IActionResult) this.Ok(ProtectedRepository.PublicKey) : this.NotFound();

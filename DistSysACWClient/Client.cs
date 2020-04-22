@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -141,54 +144,6 @@ namespace DistSysACWClient
 				this.HttpClient.Dispose();
 				this.AreUnmanagedDisposed = true;
 			}
-		}
-
-		public async Task<String> ProtectedAddFiftyAsync(String apiKey, String integer, String symKey, String iv)
-		{
-			if (apiKey is null)
-			{
-				throw new ArgumentNullException(nameof (apiKey));
-			}
-
-			if (String.IsNullOrWhiteSpace(apiKey))
-			{
-				throw new ArgumentException(nameof (apiKey));
-			}
-
-			if (integer is null)
-			{
-				throw new ArgumentNullException(nameof (integer));
-			}
-
-			if (String.IsNullOrWhiteSpace(integer))
-			{
-				throw new ArgumentException(nameof (integer));
-			}
-
-			if (symKey is null)
-			{
-				throw new ArgumentNullException(nameof (symKey));
-			}
-
-			if (String.IsNullOrWhiteSpace(symKey))
-			{
-				throw new ArgumentException(nameof (symKey));
-			}
-
-			if (iv is null)
-			{
-				throw new ArgumentNullException(nameof (iv));
-			}
-
-			if (String.IsNullOrWhiteSpace(iv))
-			{
-				throw new ArgumentException(nameof (iv));
-			}
-
-			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{this.HttpClient.BaseAddress.AbsoluteUri}api/protected/addfifty?encryptedInteger={integer}&encryptedSymKey={symKey}&encryptedIV={iv}");
-			request.Headers.Add("ApiKey", apiKey);
-			HttpResponseMessage response = await this.HttpClient.SendAsync(request);
-			return await response.Content.ReadAsStringAsync();
 		}
 
 		public async Task<String> ProtectedGetPublicKeyAsync(String apiKey)
